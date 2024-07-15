@@ -82,7 +82,6 @@ public:
 
   long ReadHeader(ifstream*);
   long ReadDataTimingMode(ifstream*);
-  long ReadDataSpecTimingMode(ifstream*);
 
   void set_short(unsigned short &, char*&);
   void set_24bit(unsigned int &, char*&);
@@ -94,11 +93,9 @@ public:
 
   unsigned short NHits; // Number of recorded hits
   eventTiming GetTimingEvent(unsigned int);
-  eventSpecTiming GetSpecTimingEvent(unsigned int);
 
 	// Event Data
   vector<eventTiming> dataTiming;
-  vector<eventSpecTiming> dataSpecTiming;
   
 private:
   bool firstline=true;
