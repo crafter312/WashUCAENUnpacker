@@ -1,29 +1,19 @@
-//File created to unpack the CAEN D5202 into a class that stores all
-//of the data for each event.
+// Modified on 15 July by Henry Webb
 
 #include "CAENd5202.h"
 
-//Definitions for the Event class, holds one event.
-//define a bunch of GetX methods of the Event class
-//unsigned short  Event::GetBoard()       const { return fBoard;   }
-
+// File created to unpack the CAEN DT5202 into a class that stores all
+// of the data for each event. This version of the unpacker is designed
+// to work only with timing-only events (acqMode==0x02)
 
 string Event::Print(bool b = false) const
 {
   ostringstream oss;
-  oss << "board:"<< (int)boardID << "\t timeStamp:" << fixed << timeStamp << "\t NHits:" << NHits;
-
-  if (acqMode == 0x03)
-    oss << "\tTrigID:" << hex << TrigID << dec;
-  oss << endl;
+  oss << "board:" << (int)boardID << "\t timeStamp:" << fixed << timeStamp << "\t NHits:" << NHits << endl;
 
   // column headers
-  if (b) {
-    oss << "EV# | channel | pos | data type | ToA | ToT";
-    if (acqMode == 0x03)
-      oss << " | low | high";
-    oss << endl;
-  }
+  if (b)
+    oss << "EV# | channel | pos | data type | ToA | ToT" << endl;
 
   // hit loop
   eventTiming ev;
@@ -36,9 +26,6 @@ string Event::Print(bool b = false) const
   return oss.str();
 }
 
-
-
-
 Event::Event(string bname, string rname)
 {
   clear();
@@ -49,10 +36,12 @@ Event::Event(string bname, string rname)
 
 Event::Event(Event* rhs)
 {
+	// Copy event header info
 	boardID = rhs->boardID;
 	timeStamp = rhs->timeStamp;
-	NHits = rhs->NHits;
+	NHits = rhs->NHits;	
 
+	// Copy event data
 	dataTiming = rhs->dataTiming;
 
 	copy(rhs->bluegains, rhs->bluegains+64, bluegains);
@@ -88,13 +77,8 @@ long Event::ReadEventFromStream(ifstream *pfs)
     firstline = false;
   }
 
-  if (acqMode == 0x02)
-    ReadDataTimingMode(pfs);
-  else {
-		char buf[4];
-		sprintf(buf, "%02x", acqMode);
-		throw invalid_argument("Invalid acquisition mode (should be 0x02): " + string(buf));
-	}
+	// acqMode check happens in ReadHeader function
+	ReadDataTimingMode(pfs);
 
   // Get final position
   std::streampos finalPos = pfs->tellg();
@@ -121,6 +105,7 @@ eventTiming Event::GetTimingEvent(unsigned int i) {
   return dataTiming[i];
 }
 
+// Reads and checks header variables
 long Event::ReadHeader(ifstream *pfs)
 {
   size_t evtsize = 25;
@@ -128,39 +113,58 @@ long Event::ReadHeader(ifstream *pfs)
   pfs->read((char*)buf, evtsize);
   char* pbuf = buf;
 
+	// Copy default formatting
+	ios init(NULL);
+	init.copyfmt(cout);
+
+	// Declare local header variables
+	unsigned short formatVersion;
+  unsigned int softwareVersion;
+	unsigned short modelnumber; // should be 5202 to match DT5202 board
+	unsigned short runnum;
+	unsigned char acqMode;      // 0x01 for SpectroscopyMode; 0x02 for TimingMode; 0x03 for Spectroscopy+TimingMode; 0x04 for CountingMode
+	unsigned short NChannels;   // NChannels is the total number of channels of the Energy histogram
+	unsigned char timeUnit;     // specifies time unit of ToT and ToA (see Janus manual, sec. 3.8.1)
+  float timeConversion;       // conversion value between LSB and ns for the timing information (1 LSB = 0.5 ns for A5202/DT5202)
+  time_t startAcq;            // time of acquisition start in ms since Unix Epoch
+
   set_short(formatVersion, pbuf);
-  cout << "Format Version: " << hex << formatVersion << dec << endl; 
+  cout << "Format version: " << hex << formatVersion << dec << endl; 
   set_24bit(softwareVersion, pbuf);
-  cout << "Software Version: " << hex << softwareVersion << dec << endl;
+  cout << "Software version: " << hex << softwareVersion << dec << endl;
   
   set_val(modelnumber, pbuf);
+	cout << "Model number: " << modelnumber << endl;
   if (modelnumber != 5202)
-  {
-    cout << "you have the wrong file type" << endl;
-    abort();
-  }
+		throw invalid_argument("Invalid model number (should be 5202)");
 
   set_val(runnum, pbuf);
-  cout << "Reading Run#" << runnum << endl;
+  cout << "Reading run #" << runnum << endl;
 
   set_val(acqMode, pbuf);
-  cout << "Acquisition Mode: " << (short)acqMode << endl;
+  cout << "Acquisition Mode: " << setw(2) << setfill('0') << hex << (short)acqMode << endl;
+	if (acqMode != 0x02) {
+		char tempbuf[4];
+		sprintf(tempbuf, "%02x", acqMode);
+		throw invalid_argument("Invalid acquisition mode (should be 0x02): " + string(tempbuf));
+	}
+
+	// Reset formatting
+	cout.copyfmt(init);
 
   set_val(NChannels, pbuf);
   cout << "Number of channels: " << NChannels << endl;
 
-  //if (timeUnit) all times in units of ns, else times are in channels
+  //If timeUnit==1 all times in units of ns, else times are in channels (LSB)
   set_val(timeUnit, pbuf);
   cout << "Time Unit: " << (short)timeUnit << endl;
 
   set_val(timeConversion, pbuf);
-  cout << "Time conversion: " << timeConversion << "ns (should be 0.5ns)" << endl;
+  cout << "Time conversion: " << timeConversion << " ns (should be 0.5 ns)" << endl;
 
   set_val(startAcq, pbuf);
-
   startAcq /= 1000;
   printf("data taken on %s", ctime(&startAcq));
-  //printf("%s", asctime(gmtime(&startAcq)));
 }
 
 
@@ -171,6 +175,7 @@ long Event::ReadDataTimingMode(ifstream *pfs)
   char peaker[peaksize];
   pfs->read((char*)peaker, peaksize);
   char* pbuf = peaker;
+	unsigned short eventSize;
   set_val(eventSize, pbuf);
 
   //create the buffer (size 2 less because we already read the first part)
@@ -201,7 +206,6 @@ long Event::ReadDataTimingMode(ifstream *pfs)
 void Event::clear()
 {
   // Event Header (Timing Mode)
-  eventSize = 0;
   boardID = 0;
   timeStamp = 0;
   NHits = 0; // Number of recorded hits

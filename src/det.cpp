@@ -72,7 +72,7 @@ bool det::unpack(ifstream *pevtfile)
 			//cout << "load red" << endl;
 			redbuffevents.insert(redbuffevents.begin(), SIPMeventcur);
 			if (redbuffevents.size() > 20){
-				redbuffevents.pop_back(); //throw away last element so array size is always 50
+				redbuffevents.pop_back(); //throw away last element so array size is always 20 max
 			}
 			
 		}
@@ -81,7 +81,7 @@ bool det::unpack(ifstream *pevtfile)
 			//cout << "load blue" << endl;
 			bluebuffevents.insert(bluebuffevents.begin(), SIPMeventcur);
 			if (bluebuffevents.size() > 20){
-				bluebuffevents.pop_back(); //throw away last element so array size is always 50
+				bluebuffevents.pop_back(); //throw away last element so array size is always 20 max
 				//TODO potentially a huge bug, I don't know if I have actually deleted the variable and freed up memory
 			}
 		}

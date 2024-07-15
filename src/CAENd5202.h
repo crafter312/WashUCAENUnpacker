@@ -9,6 +9,7 @@
 #include <time.h>
 #include <chrono>
 #include <stdexcept>
+#include <iomanip>
 
 using namespace std;
 
@@ -59,43 +60,40 @@ struct eventSpecTiming {
 
 
 class Event {
+
 public:
   Event(string, string);
 	Event(Event* rhs);
-  //all GetX and print functions useful for debugging
-  //unsigned short  GetBoard() const;
 
-  string Print(bool b) const;
+	// For debugging
+	string Print(bool b) const;
   
-  //This template class does the unpacking work. It will take in a position p in
-  //the buffer and the variable t it expects with type T, saving the data in the
-  //buffer to the indicated variable t, then advancing the buffer.
-  //reads in data Little Endian
+  // This template class does the unpacking work. It will take in a position p in
+  // the buffer and the variable t it expects with type T, saving the data in the
+  // buffer to the indicated variable t, then advancing the buffer.
+  // reads in data Little Endian
   template<class T> void set_val(T& t, char*& p)
   {
     t = *reinterpret_cast<T*>(p);
     p += sizeof(T);
   }
   
-  long ReadEventFromStream(ifstream*);
-  void clear();
+	void clear();
 
+  long ReadEventFromStream(ifstream*);
   long ReadHeader(ifstream*);
   long ReadDataTimingMode(ifstream*);
 
   void set_short(unsigned short &, char*&);
   void set_24bit(unsigned int &, char*&);
 
-	unsigned char GetAcqMode() { return acqMode; }
-
-	double GetTimeStamp() { return timeStamp; }
-	unsigned char GetBoardID() { return boardID; }
-
-  unsigned short NHits; // Number of recorded hits
   eventTiming GetTimingEvent(unsigned int);
+	unsigned char GetBoardID() { return boardID; }
+	double GetTimeStamp() { return timeStamp; }
 
 	// Event Data
-  vector<eventTiming> dataTiming;
+  vector<eventTiming> dataTiming; // vector of hits
+	unsigned short NHits;           // number of hits
   
 private:
   bool firstline=true;
@@ -104,23 +102,9 @@ private:
 	float bluegains[64];
 	float redgains[64];
 
-  // File Header
-  unsigned short formatVersion;
-  unsigned int softwareVersion; // When read gets software version and acq mode
-  unsigned short modelnumber;
-  unsigned short runnum;
-  unsigned char acqMode; // 0x01 for SpectroscopyMode; 0x02 for TimingMode; 0x03 for Spectroscopy+TimingMode; 0x04 for CountingMode
-  unsigned char timeUnit;
-  unsigned short NChannels; // NChannels is the total number of channels of the Energy histogram
-  float timeConversion; // Time conversion is the conversion value between LSB and ns for the timing information. For A5202/DT5202 this value is 1 LSB = 0.5 ns
-  time_t startAcq; // The ”Start Acquisition” information is expressed in ms with reference to the UnixEpoch time
-
-  // Event info (Timing Mode)
+	// Event info (Timing Mode)
   unsigned char boardID;
   double timeStamp;
-  unsigned short eventSize;
-  unsigned long TrigID;
-  unsigned long chanMask;
 
 	void ReadGains(string, float*);
 };
