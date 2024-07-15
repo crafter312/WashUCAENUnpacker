@@ -1,0 +1,13 @@
+void Plot_XY()
+{
+
+   TFile *infile = new TFile(../sort.root);
+   if(!infile.IsOpen())
+      {
+	 cout << "Couldn't open file" << endl;
+      }
+
+   
+
+   
+}
