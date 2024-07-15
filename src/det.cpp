@@ -8,8 +8,7 @@
 #define CONFIGPATH "/home/Li6Webb/Desktop/SFA/caenUnpacker/config/"
 
 // Constructor
-det::det(histo * Histo1)
-{
+det::det(histo * Histo1) {
   Histo = Histo1;
   SIPMevent = new Event(string(CONFIGPATH) + "blue_gain_matching.txt", string(CONFIGPATH) + "red_gain_matching.txt");
 	Fiber = new fiber(100.); // <-dist in mm from the target
@@ -19,11 +18,13 @@ det::det(histo * Histo1)
 det::~det() {}
 
 // Unpack class handles the opened data file, unpacks each event
-bool det::unpack(ifstream *pevtfile)
-{ 
+bool det::unpack(ifstream *pevtfile) { 
   nevts = 0;
   long nbytes = 0;
-  nbytes = SIPMevent->ReadEventFromStream(pevtfile);
+
+	// Read file header
+	// THIS MUST BE DONE ONCE BEFORE READING AN EVENT!
+  nbytes = SIPMevent->ReadHeader(pevtfile);
 
 	// Declare common variables
 	double timeStamp;
@@ -31,25 +32,14 @@ bool det::unpack(ifstream *pevtfile)
 	float toa;
 	unsigned char chan;
 
-	// Handle timing-only mode
+	// Event loop (timing-only mode)
 	eventTiming ev;
-  for(;;)
-  {
+  for(;;) {
+		nbytes = SIPMevent->ReadEventFromStream(pevtfile); // reads next event
+		if(nbytes == -1) break; // stop at end of file
+
   	Event* SIPMeventcur = new Event(SIPMevent);
-
-		if(nbytes == -1) break;
-		//if(nevts > 10) return true;
-
-		//cout << endl;
-		//cout << endl;
-		//cout << "event # " << nevts << endl;
-    //cout << SIPMevent->Print(true) << endl;
-		//cout << "NHits " << SIPMeventcur->NHits << endl;
-
-
-
-
-
+		//cout << SIPMeventcur->Print(true) << endl;
 
 		timeStamp = SIPMeventcur->GetTimeStamp();
     ev = SIPMeventcur->GetTimingEvent(0);
@@ -57,33 +47,24 @@ bool det::unpack(ifstream *pevtfile)
     toa = ev.ToA;
 		chan = ev.chan;
 
-		
-		//cout << SIPMeventcur->Print(true) << endl;
-
     if(tot > -1) Histo->tot_hist->Fill(tot);
     if(toa > -1) Histo->toa_hist->Fill(toa);
-    Histo->FillTree(timeStamp, SIPMevent->GetBoardID(), SIPMevent->dataTiming);
+    Histo->FillTree(timeStamp, SIPMeventcur->GetBoardID(), SIPMeventcur->dataTiming);
 
-
-		//inside SIPMevent it has      std::vector<eventTiming> dataTiming;
-		//load in eventTiming into buffer of events
-		if (SIPMeventcur->GetBoardID() == 0)
-		{
-			//cout << "load red" << endl;
+		// Add event to buffer
+		if (SIPMeventcur->GetBoardID() == 0) {
 			redbuffevents.insert(redbuffevents.begin(), SIPMeventcur);
-			if (redbuffevents.size() > 20){
-				redbuffevents.pop_back(); //throw away last element so array size is always 20 max
-			}
-			
+
+			// limit red vector size to 20
+			if (redbuffevents.size() > 20)
+				redbuffevents.pop_back(); //TODO potentially a huge bug, I don't know if I have actually deleted the variable and freed up memory
 		}
-		if (SIPMeventcur->GetBoardID() == 1)
-		{
-			//cout << "load blue" << endl;
+		else if (SIPMeventcur->GetBoardID() == 1) {
 			bluebuffevents.insert(bluebuffevents.begin(), SIPMeventcur);
-			if (bluebuffevents.size() > 20){
-				bluebuffevents.pop_back(); //throw away last element so array size is always 20 max
-				//TODO potentially a huge bug, I don't know if I have actually deleted the variable and freed up memory
-			}
+
+			// limit blue vector size to 20
+			if (bluebuffevents.size() > 20)
+				bluebuffevents.pop_back();
 		}
 
 		MatchEvents();
@@ -91,51 +72,33 @@ bool det::unpack(ifstream *pevtfile)
     SIPMevent->clear();
     Histo->clear();
     nevts++;
-
-  	nbytes = SIPMevent->ReadEventFromStream(pevtfile);
   }
 
   return true;
 }
 
-
-void det::MatchEvents(){
+void det::MatchEvents() {
 
 	bool matched = false;
-	double tstampdiff = 0; //TODO check timestamps are doubles not unsigned longs
-	//cout << "redbuffevents.size(): " << redbuffevents.size() << "   bluebuffevents.size(): " << bluebuffevents.size() << endl;
-	for (int i=0; i<redbuffevents.size(); i++){
-		for (int j=0; j<bluebuffevents.size(); j++){
+	double tstampdiff = 0;
+	
+	for (int i = 0; i<redbuffevents.size(); i++) {
+		for (int j = 0; j<bluebuffevents.size(); j++) {
 
 			tstampdiff = abs(redbuffevents[i]->GetTimeStamp() - bluebuffevents[j]->GetTimeStamp());
-			//cout << "redbuffevents[i]->GetTimeStamp() " << fixed << redbuffevents[i]->GetTimeStamp() << endl;
-			//cout << "bluebuffevents[i]->GetTimeStamp() " << fixed <<  bluebuffevents[j]->GetTimeStamp() << endl;
-			//cout << "checking events i,j = " << i << "," << j << " in buff with tstampdiff = " << tstampdiff << endl;
 
-			//cout << "redbuffevents[j]->print()" << redbuffevents[i]->Print(true) << endl;
-			//cout << "bluebuffevents[j]->print()" << bluebuffevents[j]->Print(true) << endl;
+			if (tstampdiff < 2) {
+				// (Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
+				Fiber->make_2d(bluebuffevents[j], redbuffevents[i]);
 
-			//TODO don't forget about single layer events, we want to look at these for efficiency
-			//TODO delete events, maybe just delete all events once we find a match
-			//keep track of timestamp for matches, throw away all events older than that, but count those up (these are singles)
-
-			if (tstampdiff < 2){ //timestamp is in microsec?
-				//cout << "matched with tstampdiff " << tstampdiff << endl;
-										//(Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
-				Fiber->make_2d(bluebuffevents[j], redbuffevents[i]); 
-
-				
-				
-
-				//write histograms here
+				//	Write histograms and tree here
 			  Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
 			  Histo->Fiber_xy->Fill(Fiber->x, Fiber->y);
         Histo->Fiber_toax->Fill(bluebuffevents[j]->dataTiming[Fiber->posmaxhorz].ToA);
         Histo->Fiber_toay->Fill(redbuffevents[i]->dataTiming[Fiber->posmaxvert].ToA);
 				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);
 
-				//TODO plot with timestamp difference and ToA difference
-
+				// Plot hit map for individual events
         if (Nmatched == 0) {
           int PHraw, ToAraw, pos;
           for (int k=0; k<bluebuffevents[j]->NHits; k++) {
@@ -154,22 +117,17 @@ void det::MatchEvents(){
           }
         }
 
-        matched = true;
+				// Increment matched and unmatched counts
 				Nmatched += 1;
-			}
-			if (matched) {
-        Nsingles += redbuffevents.size() - i + bluebuffevents.size() - j - 2;
+				Nsingles += redbuffevents.size() - i + bluebuffevents.size() - j - 2;
+
+				// Delete all events older than matched pair
 		    redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
 		    bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
-        break;
-      }
-		}
-		if (matched) break;
-	}
 
-	//once a match is found, count up the unmatched events and then throw away all oler events because these are singles
-	if (matched){
-		
+				return;
+			}
+		}
 	}
 }
 

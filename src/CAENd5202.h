@@ -80,9 +80,8 @@ public:
   
 	void clear();
 
+	long ReadHeader(ifstream*);
   long ReadEventFromStream(ifstream*);
-  long ReadHeader(ifstream*);
-  long ReadDataTimingMode(ifstream*);
 
   void set_short(unsigned short &, char*&);
   void set_24bit(unsigned int &, char*&);
@@ -104,7 +103,7 @@ private:
 
 	// Event info (Timing Mode)
   unsigned char boardID;
-  double timeStamp;
+  double timeStamp; // start of Tref window in ms
 
 	void ReadGains(string, float*);
 };

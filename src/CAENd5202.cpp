@@ -63,31 +63,6 @@ void Event::ReadGains(string ifname, float* arr) {
 	}
 }
 
-//reads one event from the stream and saves it to the private variables
-long Event::ReadEventFromStream(ifstream *pfs)
-{
-  pfs->peek();
-  if (!pfs->good())
-    return -1;
-
-  // Get initial position
-  std::streampos initialPos = pfs->tellg();
-  if (firstline) {
-    ReadHeader(pfs);
-    firstline = false;
-  }
-
-	// acqMode check happens in ReadHeader function
-	ReadDataTimingMode(pfs);
-
-  // Get final position
-  std::streampos finalPos = pfs->tellg();
-
-  // Return # of bytes read
-  return long(finalPos - initialPos);
-}
-
-
 //set_vals in need Big Endian style
 void Event::set_short(unsigned short &t, char*& p)
 {
@@ -106,6 +81,7 @@ eventTiming Event::GetTimingEvent(unsigned int i) {
 }
 
 // Reads and checks header variables
+// THIS MUST BE EXECUTED ONCE BEFORE READING AN EVENT!!
 long Event::ReadHeader(ifstream *pfs)
 {
   size_t evtsize = 25;
@@ -167,10 +143,17 @@ long Event::ReadHeader(ifstream *pfs)
   printf("data taken on %s", ctime(&startAcq));
 }
 
-
-long Event::ReadDataTimingMode(ifstream *pfs)
+// Reads one event from the stream and saves it to the private variables
+long Event::ReadEventFromStream(ifstream *pfs)
 {
-  //peak at the first part to deterime how large of a buffer to create
+	pfs->peek();
+  if (!pfs->good())
+    return -1;
+
+	// Get initial position
+	std::streampos initialPos = pfs->tellg();
+
+  // Peak at the first part to deterime how large of a buffer to create
   size_t peaksize = 2;
   char peaker[peaksize];
   pfs->read((char*)peaker, peaksize);
@@ -178,7 +161,7 @@ long Event::ReadDataTimingMode(ifstream *pfs)
 	unsigned short eventSize;
   set_val(eventSize, pbuf);
 
-  //create the buffer (size 2 less because we already read the first part)
+  // Create the buffer (size 2 less because we already read the first part)
   char buf[eventSize-2];
   pfs->read((char*)buf, eventSize-2);
   pbuf = buf;
@@ -201,6 +184,11 @@ long Event::ReadDataTimingMode(ifstream *pfs)
     dataTiming.push_back(Ev);
   }
 
+	// Get final position
+  std::streampos finalPos = pfs->tellg();
+
+	// Return # of bytes read
+  return long(finalPos - initialPos);
 }
 
 void Event::clear()
