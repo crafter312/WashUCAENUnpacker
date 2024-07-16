@@ -35,8 +35,9 @@ int main(int argc, char* argv[])
   files.push_back(namein1);
   string namein;
   
-  histo * Histo = new histo();  // histo class stores all the histograms created
-  det Det(Histo);               // det class is where we store all of the events and analyse them
+  histo * Histo = new histo(); // histo class stores all the histograms created
+	float distance = 100.;       // distance in mm from target to detector
+  det Det(Histo, distance);    // det class is where we store all of the events and analyse them
   
   for (int i = 0; i < files.size(); i++)
   {
