@@ -13,8 +13,22 @@ void Plot_XY(int run = 0) {
 		return;
 	}
 
-	TCanvas *mycan = new TCanvas("mycan","",800,800);
+	// Calculate fractional margins (default margin is 0.1 fraction of width/height)
+	int canw = 900;
+	int canh = 800;
+	int pixr = 100; // extra right margin in pixels
+
+	int histw = (int)(canw * 0.8) - pixr;
+	double ymarg = max(canh - histw, 0) / (2.0 * canh);
+	double xmarg = 0.1 + ((double)pixr / (double)canw);
+
+	TCanvas *mycan = new TCanvas("mycan","",canw,canh);
+	mycan->SetMargin(0.1,xmarg,ymarg,ymarg); //left, right, bottom, top
 	mycan->Draw();
+
+	//TPad *mypad = new TPad("mypad","",0,0,0.5,0.5);
+	//mypad->Draw();
+	//mypad->cd();
 
 	TH2I *XY = (TH2I*)infile->Get("FiberHitMap/Fiber_xy");
 	XY->Draw("colz");
