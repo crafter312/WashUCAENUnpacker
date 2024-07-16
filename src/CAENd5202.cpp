@@ -39,12 +39,13 @@ Event::Event(Event* rhs) {
 }
 
 //set_vals in need Big Endian style
-void Event::set_short(unsigned short &t, char*& p) {
+void Event::set_short(unsigned short &t, char*& p)
+{
   t = (*p++ << 8);
   t = t | *p++;
 }
-
-void Event::set_24bit(unsigned int &t, char*& p) {
+void Event::set_24bit(unsigned int &t, char*& p)
+{
   t = (*p++ << 8);
   t = (t | *p++) << 8;
   t = t | *p++;
@@ -52,7 +53,8 @@ void Event::set_24bit(unsigned int &t, char*& p) {
 
 // Reads and checks header variables
 // THIS MUST BE EXECUTED ONCE BEFORE READING AN EVENT!!
-long Event::ReadHeader(ifstream *pfs) {
+long Event::ReadHeader(ifstream *pfs)
+{
   size_t evtsize = 25;
   char buf[evtsize];
   pfs->read((char*)buf, evtsize);
@@ -113,7 +115,8 @@ long Event::ReadHeader(ifstream *pfs) {
 }
 
 // Reads one event from the stream and saves it to the private variables
-long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegains) {
+long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegains)
+{
 	pfs->peek();
   if (!pfs->good())
     return -1;
@@ -127,11 +130,7 @@ long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegai
   pfs->read((char*)peaker, peaksize);
   char* pbuf = peaker;
 	unsigned short eventSize;
-
-	cout << "0" << endl;
   set_val(eventSize, pbuf);
-	cout << "eventSize: " << eventSize << endl;
-	cout << "1" << endl;
 
   // Create the buffer (size 2 less because we already read the first part)
   char buf[eventSize-2];
@@ -139,36 +138,20 @@ long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegai
   pbuf = buf;
 
   set_val(boardID, pbuf);
-	cout << "2" << endl;
   set_val(timeStamp, pbuf);
-	cout << "3" << endl;
   set_val(NHits, pbuf);
-	cout << "4" << endl;
 
   eventTiming Ev;
 	unsigned char type; // 0x10, if only the ToA value is saved for that channel; 0x20, if only the ToT value is saved for that channel; 0x30, if both ToA and ToT values are saved
-  for (int n =0; n < NHits; n++) {
+  for (int n=0; n<NHits; n++) {
     Ev.clear();
     
     set_val(Ev.chan, pbuf);
-		cout << "5" << endl;
-
-		// Channel # is converted to fiber # as follows:
-		// fib = ((iCh - (iCh % 2)) / 2) + ((iCh % 2) * 32)
 		Ev.pos = (((unsigned int)Ev.chan - ((unsigned int)Ev.chan % 2)) / 2) + (((unsigned int)Ev.chan % 2) * 32);
-    
-		set_val(type, pbuf);
-		cout << "6" << endl;
-    if (type == 0x10 || type == 0x30) {
-			set_val(Ev.ToA, pbuf);
-			cout << "7" << endl;
-		}
-    if (type == 0x20 || type == 0x30) {
-			set_val(Ev.ToT, pbuf);
-			cout << "8" << endl;
-		}
+    set_val(type, pbuf);
+    if (type == 0x10 || type == 0x30) set_val(Ev.ToA, pbuf);
+    if (type == 0x20 || type == 0x30) set_val(Ev.ToT, pbuf);
 		Ev.ToTmatched = ((double)Ev.ToT) * (((boardID == 0) * redgains[Ev.pos]) + ((boardID == 1) * bluegains[Ev.pos]));
-
     dataTiming.push_back(Ev);
   }
 
@@ -179,10 +162,12 @@ long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegai
   return long(finalPos - initialPos);
 }
 
-void Event::clear() {
+void Event::clear()
+{
+  // Event Header (Timing Mode)
   boardID = 0;
   timeStamp = 0;
-  NHits = 0;
+  NHits = 0; // Number of recorded hits
   dataTiming.clear();
 }
 

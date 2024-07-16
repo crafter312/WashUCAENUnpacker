@@ -8,8 +8,10 @@
 #define CONFIGPATH "/home/Li6Webb/Desktop/SFA/caenUnpacker/config/"
 
 // Constructor
-det::det(float d) {
-	distance = d;
+det::det(histo * Histo1) {
+	Histo = Histo1;
+	SIPMevent = new Event();
+	Fiber = new fiber(100.); // <-dist in mm from the target
 
 	ReadGains(string(CONFIGPATH) + "blue_gain_matching.txt", bluegains);
 	ReadGains(string(CONFIGPATH) + "red_gain_matching.txt", redgains);
@@ -114,7 +116,7 @@ void det::MatchEvents() {
 
 			if (tstampdiff < 2) {
 				// (Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
-				Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
+				Fiber->make_2d(bluebuffevents[j], redbuffevents[i]);
 
 				//	Write histograms and tree here
 				Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
