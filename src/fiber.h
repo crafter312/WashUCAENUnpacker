@@ -10,25 +10,20 @@ using namespace std;
 class fiber {
 public:
 
-	fiber(float);
-	void reset();
-	bool has_data;
+	fiber();
 	int ix;
 	int iy;
-	int multhorz;
-	int multvert;
 	float sumhorz;
 	float sumvert;
 
 	float x,y,r,theta,phi;
 	float thetadeg,phideg;
-	float distance;
 
-	// Max value positions in dataTiming which is type vector<eventTiming>
+	// Index of hit (type dataTiming) in vector with max ToT value
 	int posmaxhorz;
 	int posmaxvert;
 
-	bool make_2d(Event*, Event*);
+	bool make_2d(Event*, Event*, float);
 };
 
 #endif

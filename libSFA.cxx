@@ -142,6 +142,8 @@ namespace ROOT {
 namespace ROOT {
    static TClass *fiber_Dictionary();
    static void fiber_TClassManip(TClass*);
+   static void *new_fiber(void *p = nullptr);
+   static void *newArray_fiber(Long_t size, void *p);
    static void delete_fiber(void *p);
    static void deleteArray_fiber(void *p);
    static void destruct_fiber(void *p);
@@ -156,6 +158,8 @@ namespace ROOT {
                   typeid(::fiber), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &fiber_Dictionary, isa_proxy, 4,
                   sizeof(::fiber) );
+      instance.SetNew(&new_fiber);
+      instance.SetNewArray(&newArray_fiber);
       instance.SetDelete(&delete_fiber);
       instance.SetDeleteArray(&deleteArray_fiber);
       instance.SetDestructor(&destruct_fiber);
@@ -223,6 +227,13 @@ namespace ROOT {
 } // end of namespace ROOT for class ::Event
 
 namespace ROOT {
+   // Wrappers around operator new
+   static void *new_fiber(void *p) {
+      return  p ? new(p) ::fiber : new ::fiber;
+   }
+   static void *newArray_fiber(Long_t nElements, void *p) {
+      return p ? new(p) ::fiber[nElements] : new ::fiber[nElements];
+   }
    // Wrapper around operator delete
    static void delete_fiber(void *p) {
       delete ((::fiber*)p);

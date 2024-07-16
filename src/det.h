@@ -13,7 +13,7 @@ using namespace std;
 class det {
 
 public:
-	det(histo* Histo);
+	det(histo*, float);
 	~det();
 	histo* Histo;
 
@@ -36,6 +36,8 @@ private:
 	// Scale values for gain matching
 	double bluegains[64];
 	double redgains[64];
+
+	float distance;
 
 	void ReadGains(string, double*);
 };

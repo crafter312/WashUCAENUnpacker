@@ -5,7 +5,7 @@
 // same channel multiplicity
 // ToA difference between matched events
 
-histo::histo() : fib(0) {
+histo::histo() {
   // create root file
   file_read = new TFile("sort.root","RECREATE");
   file_read->cd();
