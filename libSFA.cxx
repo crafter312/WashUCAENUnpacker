@@ -92,54 +92,6 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static TClass *eventSpecTiming_Dictionary();
-   static void eventSpecTiming_TClassManip(TClass*);
-   static void *new_eventSpecTiming(void *p = nullptr);
-   static void *newArray_eventSpecTiming(Long_t size, void *p);
-   static void delete_eventSpecTiming(void *p);
-   static void deleteArray_eventSpecTiming(void *p);
-   static void destruct_eventSpecTiming(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::eventSpecTiming*)
-   {
-      ::eventSpecTiming *ptr = nullptr;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::eventSpecTiming));
-      static ::ROOT::TGenericClassInfo 
-         instance("eventSpecTiming", "src/CAENd5202.h", 38,
-                  typeid(::eventSpecTiming), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &eventSpecTiming_Dictionary, isa_proxy, 4,
-                  sizeof(::eventSpecTiming) );
-      instance.SetNew(&new_eventSpecTiming);
-      instance.SetNewArray(&newArray_eventSpecTiming);
-      instance.SetDelete(&delete_eventSpecTiming);
-      instance.SetDeleteArray(&deleteArray_eventSpecTiming);
-      instance.SetDestructor(&destruct_eventSpecTiming);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::eventSpecTiming*)
-   {
-      return GenerateInitInstanceLocal((::eventSpecTiming*)nullptr);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::eventSpecTiming*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *eventSpecTiming_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::eventSpecTiming*)nullptr)->GetClass();
-      eventSpecTiming_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void eventSpecTiming_TClassManip(TClass* theClass){
-      theClass->CreateAttributeMap();
-      TDictAttributeMap* attrMap( theClass->GetAttributeMap() );
-      attrMap->AddProperty("file_name","/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h");
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
    static TClass *Event_Dictionary();
    static void Event_TClassManip(TClass*);
    static void delete_Event(void *p);
@@ -152,7 +104,7 @@ namespace ROOT {
       ::Event *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::Event));
       static ::ROOT::TGenericClassInfo 
-         instance("Event", "src/CAENd5202.h", 62,
+         instance("Event", "src/CAENd5202.h", 37,
                   typeid(::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &Event_Dictionary, isa_proxy, 4,
                   sizeof(::Event) );
@@ -244,27 +196,6 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::eventTiming
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_eventSpecTiming(void *p) {
-      return  p ? new(p) ::eventSpecTiming : new ::eventSpecTiming;
-   }
-   static void *newArray_eventSpecTiming(Long_t nElements, void *p) {
-      return p ? new(p) ::eventSpecTiming[nElements] : new ::eventSpecTiming[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_eventSpecTiming(void *p) {
-      delete ((::eventSpecTiming*)p);
-   }
-   static void deleteArray_eventSpecTiming(void *p) {
-      delete [] ((::eventSpecTiming*)p);
-   }
-   static void destruct_eventSpecTiming(void *p) {
-      typedef ::eventSpecTiming current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::eventSpecTiming
 
 namespace ROOT {
    // Wrapper around operator delete
@@ -378,7 +309,6 @@ nullptr
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_AutoLoading_Map;
 struct __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventTiming;
-struct __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventSpecTiming;
 class __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  Event;
 class __attribute__((annotate("$clingAutoload$src/fiber.h")))  fiber;
 )DICTFWDDCLS";
@@ -396,7 +326,6 @@ class __attribute__((annotate("$clingAutoload$src/fiber.h")))  fiber;
     static const char* classesHeaders[] = {
 "", payloadCode, "@",
 "Event", payloadCode, "@",
-"eventSpecTiming", payloadCode, "@",
 "eventTiming", payloadCode, "@",
 "fiber", payloadCode, "@",
 nullptr

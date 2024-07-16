@@ -34,31 +34,6 @@ struct eventTiming {
   }
 };
 
-// Data structure for holding event data in timing mode. May need different structure for spectroscopy mode.
-struct eventSpecTiming {
-  unsigned char chan;
-  int pos{-1};
-  unsigned char type; // 0x10, if only the ToA value is saved for that channel; 0x20, if only the ToT value is saved for that channel; 0x30, if both ToA and ToT values are saved
-  unsigned short low{0};
-  unsigned short high{0};
-  float ToA{-1}; // Time of arrival, could be a float if calibrated
-  float ToT{-1}; // Time over threshold, could be a float if calibrated
-
-  // use these getter functions to get chan and type as shorts
-  short getChan() { return (short)chan; }
-  short getType() { return (short)type; }
-
-  void clear() {
-    low = 0;
-    high = 0;
-    pos = -1;
-    ToA = -1;
-    ToT = -1;
-  }
-};
-
-
-
 class Event {
 
 public:

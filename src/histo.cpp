@@ -70,20 +70,6 @@ void histo::InitSpecMode() {
 	tot_lg_hist = new TH2F("tot_lg_hist", "Time over Threshold vs. Low Gain", 4096, 0, 4096, 1000, 0, 1000);
 }
 
-void histo::FillTree(double ts, unsigned char id, vector<eventSpecTiming> hits) {
-  tstamp = ts;
-  boardID = id;
-	for (eventSpecTiming hit : hits) {
-    low.push_back(hit.low);
-    high.push_back(hit.high);
-	  tot.push_back(hit.ToT);
-    toa.push_back(hit.ToA);
-	  chan.push_back(hit.chan);
-	  pos.push_back(hit.pos);
-  }
-  t->Fill();
-}
-
 void histo::FillTree(double ts, unsigned char id, vector<eventTiming> hits) {
   tstamp = ts;
   boardID = id;

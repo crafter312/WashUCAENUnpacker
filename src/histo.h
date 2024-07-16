@@ -47,7 +47,6 @@ public:
   histo();  //!< constructor
   ~histo();
 	void InitSpecMode();
-  void FillTree(double, unsigned char, vector<eventSpecTiming>);
 	void FillTree(double, unsigned char, vector<eventTiming>);
 	void FillMatchedTree(fiber*, Event*, Event*);
   void clear();
