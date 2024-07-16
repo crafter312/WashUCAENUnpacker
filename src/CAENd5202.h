@@ -45,8 +45,7 @@ public:
   // the buffer and the variable t it expects with type T, saving the data in the
   // buffer to the indicated variable t, then advancing the buffer.
   // reads in data Little Endian
-  template<class T> void set_val(T& t, char*& p)
-  {
+  template<class T> void set_val(T& t, char*& p) {
     t = *reinterpret_cast<T*>(p);
     p += sizeof(T);
   }

@@ -13,13 +13,13 @@ using namespace std;
 class det {
 
 public:
-	det(histo* Histo);
+	det(float);
 	~det();
-	histo* Histo;
 
 	bool unpack(ifstream *);
 	void MatchEvents();
 	
+	histo* Histo;
 	Event* SIPMevent;
 	fiber* Fiber;
 
@@ -33,6 +33,8 @@ public:
 	long nevts;
 
 private:
+	float distance; // distance in mm between target and detector
+
 	// Scale values for gain matching
 	double bluegains[64];
 	double redgains[64];
