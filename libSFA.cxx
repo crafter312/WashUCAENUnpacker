@@ -106,7 +106,7 @@ namespace ROOT {
       ::Event *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::Event));
       static ::ROOT::TGenericClassInfo 
-         instance("Event", "src/CAENd5202.h", 37,
+         instance("Event", "src/CAENd5202.h", 35,
                   typeid(::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &Event_Dictionary, isa_proxy, 4,
                   sizeof(::Event) );

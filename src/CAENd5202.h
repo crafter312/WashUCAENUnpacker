@@ -17,14 +17,12 @@ using namespace std;
 struct eventTiming {
   unsigned char chan;
 	unsigned int pos{0};
-  unsigned char type; // 0x10, if only the ToA value is saved for that channel; 0x20, if only the ToT value is saved for that channel; 0x30, if both ToA and ToT values are saved
   int ToA{-1}; // Time of arrival, could be a float if calibrated
   short ToT{-1}; // Time over threshold, could be a float if calibrated
 	double ToTmatched{-1};
 
   // use these getter functions to get chan and type as shorts
   short getChan() { return (short)chan; }
-  short getType() { return (short)type; }
 
   void clear() {
     pos = 0;

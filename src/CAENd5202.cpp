@@ -6,21 +6,19 @@
 // of the data for each event. This version of the unpacker is designed
 // to work only with timing-only events (acqMode==0x02)
 
-string Event::Print(bool b = false) const
-{
+string Event::Print(bool b = false) const {
   ostringstream oss;
   oss << "board:" << (int)boardID << "\t timeStamp:" << fixed << timeStamp << "\t NHits:" << NHits << endl;
 
   // column headers
   if (b)
-    oss << "EV# | channel | pos | data type | ToA | ToT" << endl;
+    oss << "Ev# | channel | pos | ToA | ToT" << endl;
 
   // hit loop
   eventTiming ev;
   for (int i = 0; i < NHits; i++) {
-    oss << i;
     ev = dataTiming[i];
-    oss << " " << ev.getChan() << " " << ev.pos << " " << ev.getType() << " " << ev.ToA << " " << ev.ToT << endl;
+    oss << i << " " << ev.getChan() << " " << ev.pos << " " << ev.ToA << " " << ev.ToT << endl;
   }
 
   return oss.str();
@@ -148,15 +146,15 @@ long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegai
   set_val(NHits, pbuf);
 
   eventTiming Ev;
-  for (int n=0; n<NHits; n++)
-  {
+	unsigned char type; // 0x10, if only the ToA value is saved for that channel; 0x20, if only the ToT value is saved for that channel; 0x30, if both ToA and ToT values are saved
+  for (int n=0; n<NHits; n++) {
     Ev.clear();
     
     set_val(Ev.chan, pbuf);
 		Ev.pos = (((unsigned int)Ev.chan - ((unsigned int)Ev.chan % 2)) / 2) + (((unsigned int)Ev.chan % 2) * 32);
-    set_val(Ev.type, pbuf);
-    set_val(Ev.ToA, pbuf);
-    set_val(Ev.ToT, pbuf);
+    set_val(type, pbuf);
+    if (type == 0x10 || type == 0x30) set_val(Ev.ToA, pbuf);
+    if (type == 0x20 || type == 0x30) set_val(Ev.ToT, pbuf);
 		Ev.ToTmatched = ((double)Ev.ToT) * (((boardID == 0) * redgains[Ev.pos]) + ((boardID == 1) * bluegains[Ev.pos]));
     dataTiming.push_back(Ev);
   }
