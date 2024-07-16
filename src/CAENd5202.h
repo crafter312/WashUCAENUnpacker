@@ -37,7 +37,7 @@ struct eventTiming {
 class Event {
 
 public:
-  Event(string, string);
+  Event();
 	Event(Event* rhs);
 
 	// For debugging
@@ -56,7 +56,7 @@ public:
 	void clear();
 
 	long ReadHeader(ifstream*);
-  long ReadEventFromStream(ifstream*);
+  long ReadEventFromStream(ifstream*, double*, double*); // input file, redgains, bluegains
 
   void set_short(unsigned short &, char*&);
   void set_24bit(unsigned int &, char*&);
@@ -72,15 +72,9 @@ public:
 private:
   bool firstline=true;
 
-	// Scale values for gain matching
-	double bluegains[64];
-	double redgains[64];
-
 	// Event info (Timing Mode)
   unsigned char boardID;
   double timeStamp; // start of Tref window in ms
-
-	void ReadGains(string, double*);
 };
 
 #endif

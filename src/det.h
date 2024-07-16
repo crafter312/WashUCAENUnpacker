@@ -10,17 +10,17 @@
 
 using namespace std;
 
-class det
-{
- public:
-  det(histo* Histo);
-  ~det();
-  histo* Histo;
+class det {
 
-  bool unpack(ifstream *);
+public:
+	det(histo* Histo);
+	~det();
+	histo* Histo;
+
+	bool unpack(ifstream *);
 	void MatchEvents();
-  
-  Event* SIPMevent;
+	
+	Event* SIPMevent;
 	fiber* Fiber;
 
 	//make vector of last 50 events saved
@@ -30,7 +30,13 @@ class det
 	int Nsingles = 0;
 	int Nmatched = 0;
 
-  long nevts;
-  
+	long nevts;
+
+private:
+	// Scale values for gain matching
+	double bluegains[64];
+	double redgains[64];
+
+	void ReadGains(string, double*);
 };
 #endif

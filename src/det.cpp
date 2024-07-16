@@ -10,12 +10,31 @@
 // Constructor
 det::det(histo * Histo1) {
   Histo = Histo1;
-  SIPMevent = new Event(string(CONFIGPATH) + "blue_gain_matching.txt", string(CONFIGPATH) + "red_gain_matching.txt");
+  SIPMevent = new Event();
 	Fiber = new fiber(100.); // <-dist in mm from the target
+
+	ReadGains(string(CONFIGPATH) + "blue_gain_matching.txt", bluegains);
+	ReadGains(string(CONFIGPATH) + "red_gain_matching.txt", redgains);
 }
 
 // Destructor
 det::~det() {}
+
+// Read scaling values for gain matching from file
+void det::ReadGains(string ifname, double* arr) {
+	ifstream ifile;
+	ifile.open(ifname, ios::in);
+	if (!ifile.is_open())
+		throw invalid_argument("Supplied input file does not open properly");
+	
+	double data;
+	for (int i = 0; i < 64; i++) {
+		ifile >> data;
+		if (ifile.eof())
+			throw invalid_argument("Supplied input file shorter than expected length");
+		arr[i] = data;
+	}
+}
 
 // Unpack class handles the opened data file, unpacks each event
 bool det::unpack(ifstream *pevtfile) { 
@@ -35,7 +54,7 @@ bool det::unpack(ifstream *pevtfile) {
 	// Event loop (timing-only mode)
 	eventTiming ev;
   for(;;) {
-		nbytes = SIPMevent->ReadEventFromStream(pevtfile); // reads next event
+		nbytes = SIPMevent->ReadEventFromStream(pevtfile, redgains, bluegains); // reads next event
 		if(nbytes == -1) break; // stop at end of file
 
   	Event* SIPMeventcur = new Event(SIPMevent);

@@ -94,6 +94,8 @@ namespace ROOT {
 namespace ROOT {
    static TClass *Event_Dictionary();
    static void Event_TClassManip(TClass*);
+   static void *new_Event(void *p = nullptr);
+   static void *newArray_Event(Long_t size, void *p);
    static void delete_Event(void *p);
    static void deleteArray_Event(void *p);
    static void destruct_Event(void *p);
@@ -108,6 +110,8 @@ namespace ROOT {
                   typeid(::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &Event_Dictionary, isa_proxy, 4,
                   sizeof(::Event) );
+      instance.SetNew(&new_Event);
+      instance.SetNewArray(&newArray_Event);
       instance.SetDelete(&delete_Event);
       instance.SetDeleteArray(&deleteArray_Event);
       instance.SetDestructor(&destruct_Event);
@@ -198,6 +202,13 @@ namespace ROOT {
 } // end of namespace ROOT for class ::eventTiming
 
 namespace ROOT {
+   // Wrappers around operator new
+   static void *new_Event(void *p) {
+      return  p ? new(p) ::Event : new ::Event;
+   }
+   static void *newArray_Event(Long_t nElements, void *p) {
+      return p ? new(p) ::Event[nElements] : new ::Event[nElements];
+   }
    // Wrapper around operator delete
    static void delete_Event(void *p) {
       delete ((::Event*)p);

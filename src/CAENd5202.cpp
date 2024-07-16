@@ -26,16 +26,11 @@ string Event::Print(bool b = false) const
   return oss.str();
 }
 
-Event::Event(string bname, string rname)
-{
+Event::Event() {
   clear();
-
-	ReadGains(bname, bluegains);
-	ReadGains(rname, redgains);
 }
 
-Event::Event(Event* rhs)
-{
+Event::Event(Event* rhs) {
 	// Copy event header info
 	boardID = rhs->boardID;
 	timeStamp = rhs->timeStamp;
@@ -43,24 +38,6 @@ Event::Event(Event* rhs)
 
 	// Copy event data
 	dataTiming = rhs->dataTiming;
-
-	copy(rhs->bluegains, rhs->bluegains+64, bluegains);
-	copy(rhs->redgains, rhs->redgains+64, redgains);
-}
-
-void Event::ReadGains(string ifname, double* arr) {
-	ifstream ifile;
-	ifile.open(ifname, ios::in);
-	if (!ifile.is_open())
-		throw invalid_argument("Supplied input file does not open properly");
-	
-	double data;
-	for (int i = 0; i < 64; i++) {
-		ifile >> data;
-		if (ifile.eof())
-			throw invalid_argument("Supplied input file shorter than expected length");
-		arr[i] = data;
-	}
 }
 
 //set_vals in need Big Endian style
@@ -144,7 +121,7 @@ long Event::ReadHeader(ifstream *pfs)
 }
 
 // Reads one event from the stream and saves it to the private variables
-long Event::ReadEventFromStream(ifstream *pfs)
+long Event::ReadEventFromStream(ifstream *pfs, double* redgains, double* bluegains)
 {
 	pfs->peek();
   if (!pfs->good())
