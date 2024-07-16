@@ -26,10 +26,6 @@ void Plot_XY(int run = 0) {
 	mycan->SetMargin(0.1,xmarg,ymarg,ymarg); //left, right, bottom, top
 	mycan->Draw();
 
-	//TPad *mypad = new TPad("mypad","",0,0,0.5,0.5);
-	//mypad->Draw();
-	//mypad->cd();
-
 	TH2I *XY = (TH2I*)infile->Get("FiberHitMap/Fiber_xy");
 	XY->Draw("colz");
 
