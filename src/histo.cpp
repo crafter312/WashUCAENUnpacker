@@ -2,9 +2,6 @@
 
 // TODO:
 // summary spectrum (like Janus)
-// 1D for each channel
-// multiplicity (number of hits in an event)
-// event profile? (weighted average, needed for better hit localization)
 // same channel multiplicity
 // ToA difference between matched events
 
@@ -13,14 +10,9 @@ histo::histo() : fib(0) {
   file_read = new TFile("sort.root","RECREATE");
   file_read->cd();
 
-  // create tree
+  // create singles tree
   t = new TTree("t", "t");
-	t->Branch("tstamp", &tstamp);
-  t->Branch("boardID", &boardID);
-  t->Branch("tot", &tot);
-  t->Branch("toa", &toa);
-	t->Branch("chan", &chan);
-  t->Branch("pos", &pos);
+	t->Branch("event", &event);
 
 	// create matched events tree
 	tmatch = new TTree("tmatch", "tmatch");
@@ -28,9 +20,10 @@ histo::histo() : fib(0) {
 	tmatch->Branch("red", &red);
 	tmatch->Branch("blue", &blue);
 
-  tot_hist = new TH1F("tot_hist", "Time over Threshold", 1000, 0, 1000);
-  toa_hist = new TH1F("toa_hist", "Time of Arrival", 4096, 0, 4096);
+	// singles histograms
+  toa_hist = new TH1I("toa_hist", "Time of Arrival", 4096, 0, 4096);
 
+	// matched events histograms
   dirHitMap = new TDirectoryFile("FiberHitMap","FiberHitMap");
   dirHitMap->cd();
   Fiber_ixiy = new TH2I("Fiber_ixiy","",64,0,64,64,0,64);
@@ -50,22 +43,13 @@ histo::~histo() {
 }
 
 void histo::clear() {
-  tot.clear();
-  toa.clear();
-  chan.clear();
-  pos.clear();
-  tstamp = -1;
+  event.clear();
+	red.clear();
+	blue.clear();
 }
 
-void histo::FillTree(double ts, unsigned char id, vector<eventTiming> hits) {
-  tstamp = ts;
-  boardID = id;
-  for (eventTiming hit : hits) {
-	  tot.push_back(hit.ToT);
-    toa.push_back(hit.ToA);
-	  chan.push_back(hit.chan);
-	  pos.push_back(hit.pos);
-  }
+void histo::FillTree(Event e) {
+  event = e;
   t->Fill();
 }
 

@@ -25,15 +25,11 @@ using namespace std;
 class histo
 {
 protected:
-  TFile* file_read; //!< output root file
+  TFile* file_read; // output root file
 
+	// Single events
   TTree* t;
-	double tstamp;
-  unsigned char boardID;
-  vector<float> tot;
-  vector<float> toa;
-	vector<unsigned char> chan;
-  vector<int> pos;
+	Event event;
 
 	// Matched events
 	TTree* tmatch;
@@ -42,17 +38,19 @@ protected:
 	Event blue;
 
 public:
-  histo();  //!< constructor
+  histo();
   ~histo();
 	void InitSpecMode();
-	void FillTree(double, unsigned char, vector<eventTiming>);
+	void FillTree(Event);
 	void FillMatchedTree(fiber*, Event*, Event*);
   void clear();
 
-  TDirectoryFile* dirHitMap; //!< directory for plotting xy fiber correlations
+	Event* GetRedEvent() { return &red; }
+	Event* GetBlueEvent() { return &blue; }
 
-  TH1F* tot_hist;
-  TH1F* toa_hist;
+	TH1I* toa_hist;
+
+  TDirectoryFile* dirHitMap; // directory for plotting xy-correlated event parameters
 
 	TH2I* Fiber_ixiy;
 	TH2I* Fiber_xy;

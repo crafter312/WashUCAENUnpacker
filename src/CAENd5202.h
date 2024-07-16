@@ -59,20 +59,19 @@ public:
   void set_short(unsigned short &, char*&);
   void set_24bit(unsigned int &, char*&);
 
-  eventTiming GetTimingEvent(unsigned int);
+	unsigned short GetNHits() { return NHits; }
+  eventTiming GetTimingEvent(unsigned int i) { return dataTiming[i]; };
 	unsigned char GetBoardID() { return boardID; }
 	double GetTimeStamp() { return timeStamp; }
-
-	// Event Data
-  vector<eventTiming> dataTiming; // vector of hits
-	unsigned short NHits;           // number of hits
   
 private:
-  bool firstline=true;
-
 	// Event info (Timing Mode)
   unsigned char boardID;
   double timeStamp; // start of Tref window in ms
+
+	// Event Data
+	unsigned short NHits;           // number of hits
+  vector<eventTiming> dataTiming; // vector of hits
 };
 
 #endif

@@ -9,8 +9,8 @@
 
 // Constructor
 det::det(histo * Histo1) {
-  Histo = Histo1;
-  SIPMevent = new Event();
+	Histo = Histo1;
+	SIPMevent = new Event();
 	Fiber = new fiber(100.); // <-dist in mm from the target
 
 	ReadGains(string(CONFIGPATH) + "blue_gain_matching.txt", bluegains);
@@ -38,37 +38,41 @@ void det::ReadGains(string ifname, double* arr) {
 
 // Unpack class handles the opened data file, unpacks each event
 bool det::unpack(ifstream *pevtfile) { 
-  nevts = 0;
-  long nbytes = 0;
+	nevts = 0;
+	long nbytes = 0;
 
 	// Read file header
 	// THIS MUST BE DONE ONCE BEFORE READING AN EVENT!
-  nbytes = SIPMevent->ReadHeader(pevtfile);
+	nbytes = SIPMevent->ReadHeader(pevtfile);
 
 	// Declare common variables
-	double timeStamp;
+	eventTiming hit;
 	float tot;
 	float toa;
 	unsigned char chan;
 
 	// Event loop (timing-only mode)
-	eventTiming ev;
-  for(;;) {
+	for (;;) {
 		nbytes = SIPMevent->ReadEventFromStream(pevtfile, redgains, bluegains); // reads next event
-		if(nbytes == -1) break; // stop at end of file
+		if (nbytes == -1) break; // stop at end of file
 
-  	Event* SIPMeventcur = new Event(SIPMevent);
+		Event* SIPMeventcur = new Event(SIPMevent);
 		//cout << SIPMeventcur->Print(true) << endl;
 
-		timeStamp = SIPMeventcur->GetTimeStamp();
-    ev = SIPMeventcur->GetTimingEvent(0);
-    tot = ev.ToTmatched;
-    toa = ev.ToA;
-		chan = ev.chan;
+		// Loop through hits in event
+		int nhits = (int)SIPMeventcur->GetNHits();
+		for (int i = 0; i < nhits; i++) {
+			hit = SIPMeventcur->GetTimingEvent(i);
+			tot = hit.ToTmatched;
+			toa = hit.ToA;
+			chan = hit.chan;
 
-    if(tot > -1) Histo->tot_hist->Fill(tot);
-    if(toa > -1) Histo->toa_hist->Fill(toa);
-    Histo->FillTree(timeStamp, SIPMeventcur->GetBoardID(), SIPMeventcur->dataTiming);
+			// Fill histograms
+			if (toa > -1) Histo->toa_hist->Fill(toa);
+		}
+		
+		// Fill output tree
+		Histo->FillTree(*SIPMeventcur);
 
 		// Add event to buffer
 		if (SIPMeventcur->GetBoardID() == 0) {
@@ -88,19 +92,23 @@ bool det::unpack(ifstream *pevtfile) {
 
 		MatchEvents();
 
-    SIPMevent->clear();
-    Histo->clear();
-    nevts++;
-  }
+		SIPMevent->clear();
+		Histo->clear();
+		nevts++;
+	}
 
-  return true;
+	return true;
 }
 
 void det::MatchEvents() {
 
-	bool matched = false;
+	// Advance declaration of variables
 	double tstampdiff = 0;
+	Event* tempev;
+	eventTiming ev;
+	int PHraw, ToAraw, pos;
 	
+	// Loop through event buffers
 	for (int i = 0; i<redbuffevents.size(); i++) {
 		for (int j = 0; j<bluebuffevents.size(); j++) {
 
@@ -111,38 +119,35 @@ void det::MatchEvents() {
 				Fiber->make_2d(bluebuffevents[j], redbuffevents[i]);
 
 				//	Write histograms and tree here
-			  Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
-			  Histo->Fiber_xy->Fill(Fiber->x, Fiber->y);
-        Histo->Fiber_toax->Fill(bluebuffevents[j]->dataTiming[Fiber->posmaxhorz].ToA);
-        Histo->Fiber_toay->Fill(redbuffevents[i]->dataTiming[Fiber->posmaxvert].ToA);
+				Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
+				Histo->Fiber_xy->Fill(Fiber->x, Fiber->y);
+				Histo->Fiber_toax->Fill(bluebuffevents[j]->GetTimingEvent(Fiber->posmaxhorz).ToA);
+				Histo->Fiber_toay->Fill(redbuffevents[i]->GetTimingEvent(Fiber->posmaxvert).ToA);
 				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);
-
-				// Plot hit map for individual events
-        if (Nmatched == 0) {
-          int PHraw, ToAraw, pos;
-          for (int k=0; k<bluebuffevents[j]->NHits; k++) {
-		        PHraw = bluebuffevents[j]->dataTiming[k].ToTmatched;
-            ToAraw = bluebuffevents[j]->dataTiming[k].ToA;
-            pos = bluebuffevents[j]->dataTiming[k].pos;
-            Histo->Fiber_postotx->AddBinContent(Histo->Fiber_postotx->GetBin(pos), PHraw);
-            Histo->Fiber_postoax->AddBinContent(Histo->Fiber_postoax->GetBin(pos), ToAraw);
-          }
-          for (int k=0; k<redbuffevents[i]->NHits; k++) {
-		        PHraw = redbuffevents[i]->dataTiming[k].ToTmatched;
-            ToAraw = redbuffevents[i]->dataTiming[k].ToA;
-            pos = redbuffevents[i]->dataTiming[k].pos;
-            Histo->Fiber_postoty->AddBinContent(Histo->Fiber_postoty->GetBin(pos), PHraw);
-            Histo->Fiber_postoay->AddBinContent(Histo->Fiber_postoay->GetBin(pos), ToAraw);
-          }
-        }
 
 				// Increment matched and unmatched counts
 				Nmatched += 1;
 				Nsingles += redbuffevents.size() - i + bluebuffevents.size() - j - 2;
 
 				// Delete all events older than matched pair
-		    redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
-		    bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
+				redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
+				bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
+				
+				if (Nmatched > 1) return;
+
+				// Plot hit map for individual events
+				tempev = Histo->GetBlueEvent();
+				for (int k = 0; k<tempev->GetNHits(); k++) {
+					ev = tempev->GetTimingEvent(k);
+					Histo->Fiber_postotx->AddBinContent(Histo->Fiber_postotx->GetBin(ev.pos), ev.ToT);
+					Histo->Fiber_postoax->AddBinContent(Histo->Fiber_postoax->GetBin(ev.pos), ev.ToA);
+				}
+				tempev = Histo->GetRedEvent();
+				for (int k = 0; k<tempev->GetNHits(); k++) {
+					ev = tempev->GetTimingEvent(k);
+					Histo->Fiber_postoty->AddBinContent(Histo->Fiber_postoty->GetBin(ev.pos), ev.ToT);
+					Histo->Fiber_postoay->AddBinContent(Histo->Fiber_postoay->GetBin(ev.pos), ev.ToA);
+				}
 
 				return;
 			}

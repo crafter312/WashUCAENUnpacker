@@ -34,36 +34,30 @@ bool fiber::make_2d(Event* horz, Event* vert)
 	int threshhorz = 0; //thresholds to be subtracted off of ToT values
 	int threshvert = 0;
 
-	multhorz = horz->NHits;
-	multvert = vert->NHits;
+	multhorz = horz->GetNHits();
+	multvert = vert->GetNHits();
 
-  for (int i=0;i<horz->NHits;i++)
-  {
-		int PHraw = horz->dataTiming[i].ToTmatched;
+  for (int i = 0; i < horz->GetNHits(); i++) {
+		int PHraw = horz->GetTimingEvent(i).ToTmatched;
 		int PH = max(PHraw - threshhorz, 0);
 		sumhorz += PH;
-    momhorz += PH * horz->dataTiming[i].pos;
+    momhorz += PH * horz->GetTimingEvent(i).pos;
 
-		if (PHraw > horz->dataTiming[posmaxhorz].ToTmatched)
-		{
+		if (PHraw > horz->GetTimingEvent(posmaxhorz).ToTmatched)
 			posmaxhorz = i;
-		}
   }
-  for (int i=0;i<vert->NHits;i++)
-  {
-		int PHraw = vert->dataTiming[i].ToTmatched;
+  for (int i = 0; i < vert->GetNHits(); i++) {
+		int PHraw = vert->GetTimingEvent(i).ToTmatched;
 		int PH = max(PHraw - threshvert, 0);
 		sumvert += PH;
-    momvert += PH * vert->dataTiming[i].pos;
+    momvert += PH * vert->GetTimingEvent(i).pos;
 
-		if (PHraw > vert->dataTiming[posmaxvert].ToTmatched)
-		{
+		if (PHraw > vert->GetTimingEvent(posmaxvert).ToTmatched)
 			posmaxvert = i;
-		}
   }
 
-	ix = horz->dataTiming[posmaxhorz].pos;
-	iy = vert->dataTiming[posmaxvert].pos;
+	ix = horz->GetTimingEvent(posmaxhorz).pos;
+	iy = vert->GetTimingEvent(posmaxvert).pos;
 
 
 	// CHANNEL TO FIBER

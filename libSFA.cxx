@@ -152,7 +152,7 @@ namespace ROOT {
       ::fiber *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::fiber));
       static ::ROOT::TGenericClassInfo 
-         instance("fiber", "src/fiber.h", 9,
+         instance("fiber", "src/fiber.h", 10,
                   typeid(::fiber), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &fiber_Dictionary, isa_proxy, 4,
                   sizeof(::fiber) );

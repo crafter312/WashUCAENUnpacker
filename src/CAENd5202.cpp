@@ -51,10 +51,6 @@ void Event::set_24bit(unsigned int &t, char*& p)
   t = t | *p++;
 }
 
-eventTiming Event::GetTimingEvent(unsigned int i) {
-  return dataTiming[i];
-}
-
 // Reads and checks header variables
 // THIS MUST BE EXECUTED ONCE BEFORE READING AN EVENT!!
 long Event::ReadHeader(ifstream *pfs)
