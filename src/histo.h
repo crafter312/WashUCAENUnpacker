@@ -30,8 +30,6 @@ protected:
   TTree* t;
 	double tstamp;
   unsigned char boardID;
-  vector<unsigned short> low;
-	vector<unsigned short> high;
   vector<float> tot;
   vector<float> toa;
 	vector<unsigned char> chan;
@@ -53,10 +51,8 @@ public:
 
   TDirectoryFile* dirHitMap; //!< directory for plotting xy fiber correlations
 
-  TH1I* lg_hist;
   TH1F* tot_hist;
   TH1F* toa_hist;
-  TH2F* tot_lg_hist;
 
 	TH2I* Fiber_ixiy;
 	TH2I* Fiber_xy;

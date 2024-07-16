@@ -52,22 +52,11 @@ histo::~histo() {
 }
 
 void histo::clear() {
-  low.clear();
-  high.clear();
   tot.clear();
   toa.clear();
   chan.clear();
   pos.clear();
   tstamp = -1;
-}
-
-// Extra preparation required for spectroscopy mode
-void histo::InitSpecMode() {
-	t->Branch("low", &low);
-	t->Branch("high", &high);
-
-	lg_hist = new TH1I("lg_hist", "Low Gain", 4096, 0, 4096);
-	tot_lg_hist = new TH2F("tot_lg_hist", "Time over Threshold vs. Low Gain", 4096, 0, 4096, 1000, 0, 1000);
 }
 
 void histo::FillTree(double ts, unsigned char id, vector<eventTiming> hits) {
