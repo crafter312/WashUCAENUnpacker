@@ -48,13 +48,13 @@ Event::Event(Event* rhs)
 	copy(rhs->redgains, rhs->redgains+64, redgains);
 }
 
-void Event::ReadGains(string ifname, float* arr) {
+void Event::ReadGains(string ifname, double* arr) {
 	ifstream ifile;
 	ifile.open(ifname, ios::in);
 	if (!ifile.is_open())
 		throw invalid_argument("Supplied input file does not open properly");
 	
-	float data;
+	double data;
 	for (int i = 0; i < 64; i++) {
 		ifile >> data;
 		if (ifile.eof())
@@ -180,7 +180,7 @@ long Event::ReadEventFromStream(ifstream *pfs)
     set_val(Ev.type, pbuf);
     set_val(Ev.ToA, pbuf);
     set_val(Ev.ToT, pbuf);
-		Ev.ToTmatched = ((float)Ev.ToT) * (((boardID == 0) * redgains[Ev.pos]) + ((boardID == 1) * bluegains[Ev.pos]));
+		Ev.ToTmatched = ((double)Ev.ToT) * (((boardID == 0) * redgains[Ev.pos]) + ((boardID == 1) * bluegains[Ev.pos]));
     dataTiming.push_back(Ev);
   }
 

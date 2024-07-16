@@ -20,7 +20,7 @@ struct eventTiming {
   unsigned char type; // 0x10, if only the ToA value is saved for that channel; 0x20, if only the ToT value is saved for that channel; 0x30, if both ToA and ToT values are saved
   int ToA{-1}; // Time of arrival, could be a float if calibrated
   short ToT{-1}; // Time over threshold, could be a float if calibrated
-	float ToTmatched{-1};
+	double ToTmatched{-1};
 
   // use these getter functions to get chan and type as shorts
   short getChan() { return (short)chan; }
@@ -43,7 +43,7 @@ public:
 	// For debugging
 	string Print(bool b) const;
   
-  // This template class does the unpacking work. It will take in a position p in
+  // This template method does the unpacking work. It will take in a position p in
   // the buffer and the variable t it expects with type T, saving the data in the
   // buffer to the indicated variable t, then advancing the buffer.
   // reads in data Little Endian
@@ -73,14 +73,14 @@ private:
   bool firstline=true;
 
 	// Scale values for gain matching
-	float bluegains[64];
-	float redgains[64];
+	double bluegains[64];
+	double redgains[64];
 
 	// Event info (Timing Mode)
   unsigned char boardID;
   double timeStamp; // start of Tref window in ms
 
-	void ReadGains(string, float*);
+	void ReadGains(string, double*);
 };
 
 #endif
