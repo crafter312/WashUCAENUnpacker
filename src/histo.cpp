@@ -22,12 +22,16 @@ histo::histo() {
 
 	// singles histograms
   toa_hist = new TH1I("toa_hist", "Time of Arrival", 4096, 0, 4096);
+	tot_summary_blue = new TH2I("tot_summary_blue", "Blue Fibers ToT Summary (gain-matched)", 64, 0, 64, 512, 0, 512);
+	tot_summary_red = new TH2I("tot_summary_red", "Red Fibers ToT Summary (gain-matched)", 64, 0, 64, 512, 0, 512);
 
 	// matched events histograms
   dirHitMap = new TDirectoryFile("FiberHitMap","FiberHitMap");
   dirHitMap->cd();
   Fiber_ixiy = new TH2I("Fiber_ixiy","",64,0,64,64,0,64);
   Fiber_xy = new TH2I("Fiber_xy","",64,-16,16,64,-16,16);
+	Fiber_tot_summary_x = new TH2I("Fiber_tot_summary_blue", "X Fibers ToT Summary (gain-matched, center hit)", 64, 0, 64, 512, 0, 512);
+	Fiber_tot_summary_y = new TH2I("Fiber_tot_summary_red", "Y Fibers ToT Summary (gain-matched, center hit)", 64, 0, 64, 512, 0, 512);
   Fiber_postotx = new TH1F("Fiber_postotx","",64,0,64);
   Fiber_postoty = new TH1F("Fiber_postoty","",64,0,64);
   Fiber_postoax = new TH1F("Fiber_postoax","",2048,0,2048);

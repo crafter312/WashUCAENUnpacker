@@ -50,7 +50,7 @@ bool det::unpack(ifstream *pevtfile) {
 	eventTiming hit;
 	float tot;
 	float toa;
-	unsigned char chan;
+	unsigned int pos;
 
 	// Event loop (timing-only mode)
 	for (;;) {
@@ -61,29 +61,35 @@ bool det::unpack(ifstream *pevtfile) {
 		//cout << SIPMeventcur->Print(true) << endl;
 
 		// Loop through hits in event
+		unsigned char boardID = SIPMeventcur->GetBoardID();
 		int nhits = (int)SIPMeventcur->GetNHits();
 		for (int i = 0; i < nhits; i++) {
 			hit = SIPMeventcur->GetTimingEvent(i);
 			tot = hit.ToTmatched;
 			toa = hit.ToA;
-			chan = hit.chan;
+			pos = hit.pos;
 
 			// Fill histograms
-			if (toa > -1) Histo->toa_hist->Fill(toa);
+			if (toa > -1)
+				Histo->toa_hist->Fill(toa);
+			if (tot > -1 && boardID == 0)
+				Histo->tot_summary_red->Fill(pos, tot);
+			else if (tot > -1 && boardID == 1)
+				Histo->tot_summary_blue->Fill(pos, tot);
 		}
 		
 		// Fill output tree
 		Histo->FillTree(*SIPMeventcur);
 
 		// Add event to buffer
-		if (SIPMeventcur->GetBoardID() == 0) {
+		if (boardID == 0) {
 			redbuffevents.insert(redbuffevents.begin(), SIPMeventcur);
 
 			// limit red vector size to 20
 			if (redbuffevents.size() > 20)
 				redbuffevents.pop_back(); //TODO potentially a huge bug, I don't know if I have actually deleted the variable and freed up memory
 		}
-		else if (SIPMeventcur->GetBoardID() == 1) {
+		else if (boardID == 1) {
 			bluebuffevents.insert(bluebuffevents.begin(), SIPMeventcur);
 
 			// limit blue vector size to 20
@@ -120,11 +126,17 @@ void det::MatchEvents() {
 				Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
 
 				//	Write histograms and tree here
+				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);
 				Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
 				Histo->Fiber_xy->Fill(Fiber->x, Fiber->y);
-				Histo->Fiber_toax->Fill(bluebuffevents[j]->GetTimingEvent(Fiber->posmaxhorz).ToA);
-				Histo->Fiber_toay->Fill(redbuffevents[i]->GetTimingEvent(Fiber->posmaxvert).ToA);
-				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);
+
+				ev = bluebuffevents[j]->GetTimingEvent(Fiber->posmaxhorz);
+				Histo->Fiber_tot_summary_x->Fill(ev.pos, ev.ToTmatched);
+				Histo->Fiber_toax->Fill(ev.ToA);
+
+				ev = redbuffevents[i]->GetTimingEvent(Fiber->posmaxvert);
+				Histo->Fiber_tot_summary_y->Fill(ev.pos, ev.ToTmatched);
+				Histo->Fiber_toay->Fill(ev.ToA);
 
 				// Increment matched and unmatched counts
 				Nmatched += 1;

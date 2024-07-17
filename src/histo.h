@@ -49,11 +49,15 @@ public:
 	Event* GetBlueEvent() { return &blue; }
 
 	TH1I* toa_hist;
+	TH2I* tot_summary_blue;
+	TH2I* tot_summary_red;
 
   TDirectoryFile* dirHitMap; // directory for plotting xy-correlated event parameters
 
 	TH2I* Fiber_ixiy;
 	TH2I* Fiber_xy;
+	TH2I* Fiber_tot_summary_x;
+	TH2I* Fiber_tot_summary_y;
   TH1F* Fiber_postotx;
   TH1F* Fiber_postoty;
   TH1F* Fiber_postoax;
