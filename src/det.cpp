@@ -154,16 +154,16 @@ void det::MatchEvents() {
 				for (int k = 0; k<tempev->GetNHits(); k++) {
 					ev = tempev->GetTimingEvent(k);
 					temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
-					Histo->Fiber_totx->AddBinContent(Histo->Fiber_totx->GetXaxis()->FindBin(temppos), ev.ToT);
-					Histo->Fiber_postotx->AddBinContent(Histo->Fiber_postotx->GetXaxis()->FindBin(ev.pos), ev.ToT);
+					Histo->Fiber_totx->AddBinContent(Histo->Fiber_totx->GetXaxis()->FindBin(temppos), ev.ToTmatched);
+					Histo->Fiber_postotx->AddBinContent(Histo->Fiber_postotx->GetXaxis()->FindBin(ev.pos), ev.ToTmatched);
 					Histo->Fiber_postoax->AddBinContent(Histo->Fiber_postoax->GetXaxis()->FindBin(ev.pos), ev.ToA);
 				}
 				tempev = Histo->GetRedEvent();
 				for (int k = 0; k<tempev->GetNHits(); k++) {
 					ev = tempev->GetTimingEvent(k);
 					temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
-					Histo->Fiber_toty->AddBinContent(Histo->Fiber_toty->GetXaxis()->FindBin(temppos), ev.ToT);
-					Histo->Fiber_postoty->AddBinContent(Histo->Fiber_postoty->GetXaxis()->FindBin(ev.pos), ev.ToT);
+					Histo->Fiber_toty->AddBinContent(Histo->Fiber_toty->GetXaxis()->FindBin(temppos), ev.ToTmatched);
+					Histo->Fiber_postoty->AddBinContent(Histo->Fiber_postoty->GetXaxis()->FindBin(ev.pos), ev.ToTmatched);
 					Histo->Fiber_postoay->AddBinContent(Histo->Fiber_postoay->GetXaxis()->FindBin(ev.pos), ev.ToA);
 				}
 

@@ -1,5 +1,6 @@
 void Plot_XY(int run = 0) {
 	//gROOT->SetStyle("Plain");
+	gStyle->SetPalette(kBird);
 	gStyle->SetOptStat(0);
 
 	TFile *infile;
