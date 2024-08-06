@@ -32,6 +32,8 @@ histo::histo() {
   Fiber_xy = new TH2I("Fiber_xy","",64,-16,16,64,-16,16);
 	Fiber_tot_summary_x = new TH2I("Fiber_tot_summary_blue", "X Fibers ToT Summary (gain-matched, center hit)", 64, 0, 64, 512, 0, 512);
 	Fiber_tot_summary_y = new TH2I("Fiber_tot_summary_red", "Y Fibers ToT Summary (gain-matched, center hit)", 64, 0, 64, 512, 0, 512);
+	Fiber_totx = new TH1F("Fiber_totx","",64,-16,16);
+  Fiber_toty = new TH1F("Fiber_toty","",64,-16,16);
   Fiber_postotx = new TH1F("Fiber_postotx","",64,0,64);
   Fiber_postoty = new TH1F("Fiber_postoty","",64,0,64);
   Fiber_postoax = new TH1F("Fiber_postoax","",2048,0,2048);

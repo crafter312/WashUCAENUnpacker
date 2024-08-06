@@ -9,12 +9,12 @@ LIBSRC = $(patsubst %, $(SRC)/%, $(HEADER))
 
 CC = g++
 LINKOPTION = $(shell root-config --libs --cflags)
-INCLUDE = $(shell root-config --incdir)
-CFLAGS = -c -w -std=c++14 -I$(INCLUDE)
+INCLUDE = -I$(shell root-config --incdir)
+CFLAGS = -c -w -std=c++14 $(INCLUDE)
 
 sort : $(BIN)/sort.o $(OBJECT) libSFA.cxx
 	@echo "Linking..."
-	$(CC) -o$@ $(filter-out %.cxx, $^) $(LINKOPTION) $(filter %.cxx, $^) 
+	$(CC) -o$@ $(filter-out %.cxx, $^) $(LINKOPTION) $(filter %.cxx, $^)
 	@echo "Finished"
 
 $(BIN)/%.o : $(SRC)/%.cpp

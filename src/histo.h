@@ -58,6 +58,8 @@ public:
 	TH2I* Fiber_xy;
 	TH2I* Fiber_tot_summary_x;
 	TH2I* Fiber_tot_summary_y;
+	TH1F* Fiber_totx;
+	TH1F* Fiber_toty;
   TH1F* Fiber_postotx;
   TH1F* Fiber_postoty;
   TH1F* Fiber_postoax;
