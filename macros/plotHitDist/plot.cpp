@@ -23,8 +23,8 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	// Get run # from command line arguments
-  if (argc != 3) throw invalid_argument("must specify run number and entry offset");
-  int runnum = stoi(argv[1]);
+	if (argc != 4) throw invalid_argument("must specify run number, entry offset, and multiplicity threshold");
+	int runnum = stoi(argv[1]);
 	int offset = stoi(argv[2]);
 	cout << "Run #: " << runnum << endl;
 	cout << "Start at entry # " << offset << endl;
@@ -36,9 +36,12 @@ int main(int argc, char* argv[]) {
 	tmatch->SetBranchStatus("fiber", 0);
 
 	// Set up TTreeReader
-	tmatch->Draw(">> elist", "red.NHits>4", "entryList");
+	string gate = "red.NHits>" + string(argv[3]);
+	cout << "Event selection: " << gate << endl;
+	tmatch->Draw(">> elist", gate.c_str(), "entryList");
 	TEntryList* elist;
 	gDirectory->GetObject("elist", elist);
+	cout << "Entries: " << elist->GetN() << endl;
 	TTreeReader treader(tmatch, elist);
 	TTreeReaderValue<Event> blue(treader, "blue");
 	TTreeReaderValue<Event> red(treader, "red");
@@ -47,9 +50,9 @@ int main(int argc, char* argv[]) {
 	TFile* ofile = new TFile("plot.root", "RECREATE");
 	ofile->cd();
 	TH1D* Fiber_totx = new TH1D("Fiber_totx", "", 64, -16, 16);
-  TH1D* Fiber_toty = new TH1D("Fiber_toty", "", 64, -16, 16);
-  TH1D* Fiber_postotx = new TH1D("Fiber_postotx", "", 64, 0, 64);
-  TH1D* Fiber_postoty = new TH1D("Fiber_postoty", "", 64, 0, 64);
+	TH1D* Fiber_toty = new TH1D("Fiber_toty", "", 64, -16, 16);
+	TH1D* Fiber_postotx = new TH1D("Fiber_postotx", "", 64, 0, 64);
+	TH1D* Fiber_postoty = new TH1D("Fiber_postoty", "", 64, 0, 64);
 
 	// Event loop
 	int count = 0;
@@ -59,13 +62,17 @@ int main(int argc, char* argv[]) {
 		Event tempev;
 		eventTiming ev;
 		double temppos;
+		int bin;
 
 		// Blue event
 		tempev = *blue;
 		for (int k = 0; k < tempev.GetNHits(); k++) {
 			ev = tempev.GetTimingEvent(k);
 			temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
-			Fiber_totx->AddBinContent(Fiber_totx->GetXaxis()->FindBin(temppos), ev.ToTmatched);
+			bin = Fiber_totx->GetXaxis()->FindBin(temppos);
+			if (Fiber_totx->GetBinContent(bin) > 0)
+				cout << "Multiple hit blue fiber found!" << endl;
+			Fiber_totx->AddBinContent(bin, ev.ToTmatched);
 			Fiber_postotx->AddBinContent(Fiber_postotx->GetXaxis()->FindBin(ev.pos), ev.ToTmatched);
 		}
 
@@ -74,13 +81,15 @@ int main(int argc, char* argv[]) {
 		for (int k = 0; k < tempev.GetNHits(); k++) {
 			ev = tempev.GetTimingEvent(k);
 			temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
-			Fiber_toty->AddBinContent(Fiber_toty->GetXaxis()->FindBin(temppos), ev.ToTmatched);
+			bin = Fiber_toty->GetXaxis()->FindBin(temppos);
+			if (Fiber_toty->GetBinContent(bin) > 0)
+				cout << "Multiple hit red fiber found!" << endl;
+			Fiber_toty->AddBinContent(bin, ev.ToTmatched);
 			Fiber_postoty->AddBinContent(Fiber_postoty->GetXaxis()->FindBin(ev.pos), ev.ToTmatched);
 		}
 
 		break;
 	}
-	cout << "Count: " << count << endl;
 
 	// Cleanup
 	ifile->Close();
