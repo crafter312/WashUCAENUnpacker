@@ -5,10 +5,16 @@
 
 #include "det.h"
 
+#include "CAENd5202.h"
+#include "fiber.h"
+#include "histo.h"
+
+#include <iostream>
+
 #define CONFIGPATH "/home/Li6Webb/Desktop/SFA/caenUnpacker/config/"
 
 // Constructor
-det::det(histo * Histo1, float d) {
+det::det(histo * Histo1, double d) {
 	Histo = Histo1;
 	SIPMevent = new Event();
 	Fiber = new fiber();

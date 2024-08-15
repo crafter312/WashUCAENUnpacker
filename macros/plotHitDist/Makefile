@@ -1,8 +1,9 @@
-SRC = src
-BIN = bin
+MAIN = ../..
+SRC = $(MAIN)/src
+BIN = $(MAIN)/bin
 
-# List sources manually to exclude sim.cpp and simmulti.cpp
-SOURCE = det.cpp histo.cpp CAENd5202.cpp fiber.cpp
+# List sources manually
+SOURCE = CAENd5202.cpp fiber.cpp
 OBJECT = $(patsubst %, $(BIN)/%, $(notdir $(SOURCE:.cpp=.o)))
 HEADER = CAENd5202.h fiber.h
 LIBSRC = $(patsubst %, $(SRC)/%, $(HEADER))
@@ -12,20 +13,15 @@ LINKOPTION = $(shell root-config --libs --cflags)
 INCLUDE = -I$(shell root-config --incdir)
 CFLAGS = -c -w -std=c++14 $(INCLUDE)
 
-sort : $(BIN)/sort.o $(OBJECT) libSFA.cxx
+plot : plot.o $(OBJECT) $(MAIN)/libSFA.cxx
 	@echo "Linking..."
 	$(CC) -o$@ $(filter-out %.cxx, $^) $(LINKOPTION) $(filter %.cxx, $^)
 	@echo "Finished"
 
-$(BIN)/%.o : $(SRC)/%.cpp
+plot.o : plot.cpp
 	@echo "Compiling..."
 	$(CC) $(CFLAGS) -c $< -o$@
 
-libSFA.cxx : $(LIBSRC) $(SRC)/LinkDef.h
-	rootcling $@ $^
-	@cp libSFA_rdict.pcm macros/plotHitDist/libSFA_rdict.pcm
-
 clean :
-	rm -f $(BIN)/*.o
-	rm -f *.cxx
-	rm -f *.pcm
+	rm -f plot.o
+	rm -f plot

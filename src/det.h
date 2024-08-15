@@ -1,29 +1,30 @@
 #ifndef det_
 #define det_
+
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
-#include "histo.h"
-#include "CAENd5202.h"
-#include "fiber.h"
+
+class Event;
+class fiber;
+class histo;
 
 using namespace std;
 
 class det {
 
 public:
-	det(histo*, float);
+	det(histo*, double);
 	~det();
 	histo* Histo;
 
-	bool unpack(ifstream *);
+	bool unpack(ifstream*);
 	void MatchEvents();
 	
 	Event* SIPMevent;
 	fiber* Fiber;
 
-	//make vector of last 50 events saved
+	// Vector of most recent 20 events
 	vector<Event*> redbuffevents;
 	vector<Event*> bluebuffevents;
 
@@ -41,4 +42,5 @@ private:
 
 	void ReadGains(string, double*);
 };
+
 #endif

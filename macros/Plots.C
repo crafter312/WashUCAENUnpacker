@@ -117,7 +117,7 @@ void HitMultFit(int runnum, int boardID = 1, int max = 12) {
 	st->Draw();
 }
 
-void HitMap(int runnum, int boardID = 1, int ymax = 1) {
+void HitDist(int runnum, int boardID = 1, int ymax = 1) {
 	OpenFile(runnum);
 	TTree* tmatch = ifile->Get<TTree>("tmatch");
 	SetAliases(tmatch);
@@ -133,7 +133,7 @@ void HitMap(int runnum, int boardID = 1, int ymax = 1) {
 	varexp += ">>hitMap";
 	string selection = boardID == 1
 		? "t_center_hit_blue && t_hit_diff_blue"
-		: "t_center_hit_red && t_hit_diff_red";
+		: "t_center_hit_red && t_hit_diff_red && red.NHits<=4";
 	selection += " && t_layer_diff";
 	tmatch->Draw(varexp.c_str(), selection.c_str(), "goff");
 	hitMap->Draw("colz");
