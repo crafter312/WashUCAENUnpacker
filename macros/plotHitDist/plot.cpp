@@ -50,9 +50,13 @@ int main(int argc, char* argv[]) {
 	TFile* ofile = new TFile("plot.root", "RECREATE");
 	ofile->cd();
 	TH1D* Fiber_totx = new TH1D("Fiber_totx", "", 64, -16, 16);
+	Fiber_totx->SetXTitle("X Fiber Position (mm)");
 	TH1D* Fiber_toty = new TH1D("Fiber_toty", "", 64, -16, 16);
+	Fiber_toty->SetXTitle("Y Fiber Position (mm)");
 	TH1D* Fiber_postotx = new TH1D("Fiber_postotx", "", 64, 0, 64);
+	Fiber_postotx->SetXTitle("X Fiber #");
 	TH1D* Fiber_postoty = new TH1D("Fiber_postoty", "", 64, 0, 64);
+	Fiber_postoty->SetXTitle("Y Fiber #");
 
 	// Event loop
 	int count = 0;
