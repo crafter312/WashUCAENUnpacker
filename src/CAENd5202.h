@@ -1,35 +1,34 @@
 #ifndef _eventCAEN
 #define _eventCAEN
 
-#include <vector>
-#include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
-#include <time.h>
-#include <chrono>
-#include <stdexcept>
-#include <iomanip>
+#include <vector>
 
 using namespace std;
 
 // Data structure for holding event data in timing mode. May need different structure for spectroscopy mode.
-struct eventTiming {
-  unsigned char chan;
-	unsigned int pos{0};
-  int ToA{-1}; // Time of arrival, could be a float if calibrated
-  short ToT{-1}; // Time over threshold, could be a float if calibrated
-	double ToTmatched{-1};
+class eventTiming {
 
-  // use these getter functions to get chan and type as shorts
+public:
+
+	static bool CompareToT(eventTiming, eventTiming);
+
+	/****************************************/
+
+	eventTiming();
+
+	// get chan as short
   short getChan() { return (short)chan; }
 
-  void clear() {
-    pos = 0;
-    ToA = -1;
-    ToT = -1;
-		ToTmatched = -1;
-  }
+  unsigned char chan;    // channel # from DT5202
+	unsigned int pos{0};   // channel # converted to fiber #
+  int ToA{-1};           // time of arrival, could be a float if calibrated
+  short ToT{-1};         // time over threshold, could be a float if calibrated
+	double ToTmatched{-1}; // scaled ToT calculated from gain matching parameters
+
+  void clear();
+
 };
 
 class Event {
@@ -72,6 +71,7 @@ private:
 	// Event Data
 	unsigned short NHits;           // number of hits
   vector<eventTiming> dataTiming; // vector of hits
+
 };
 
 #endif

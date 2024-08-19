@@ -58,7 +58,7 @@ namespace ROOT {
       ::eventTiming *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::eventTiming));
       static ::ROOT::TGenericClassInfo 
-         instance("eventTiming", "src/CAENd5202.h", 17,
+         instance("eventTiming", "src/CAENd5202.h", 11,
                   typeid(::eventTiming), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &eventTiming_Dictionary, isa_proxy, 4,
                   sizeof(::eventTiming) );
@@ -106,7 +106,7 @@ namespace ROOT {
       ::Event *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::Event));
       static ::ROOT::TGenericClassInfo 
-         instance("Event", "src/CAENd5202.h", 35,
+         instance("Event", "src/CAENd5202.h", 34,
                   typeid(::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &Event_Dictionary, isa_proxy, 4,
                   sizeof(::Event) );
@@ -330,7 +330,7 @@ nullptr
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_AutoLoading_Map;
-struct __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventTiming;
+class __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventTiming;
 class __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  Event;
 class __attribute__((annotate("$clingAutoload$src/fiber.h")))  fiber;
 )DICTFWDDCLS";

@@ -2,9 +2,33 @@
 
 #include "CAENd5202.h"
 
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <time.h>
+
 // File created to unpack the CAEN DT5202 into a class that stores all
 // of the data for each event. This version of the unpacker is designed
 // to work only with timing-only events (acqMode==0x02)
+
+bool eventTiming::CompareToT(eventTiming a, eventTiming b) {
+	return a.ToTmatched < b.ToTmatched;
+}
+
+////////
+
+eventTiming::eventTiming() {}
+
+void eventTiming::clear() {
+	pos = 0;
+	ToA = -1;
+	ToT = -1;
+	ToTmatched = -1;
+}
+
+/**********************************************************************************/
 
 string Event::Print(bool b = false) const {
   ostringstream oss;
