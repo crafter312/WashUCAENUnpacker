@@ -2,6 +2,7 @@
 
 #include "CAENd5202.h"
 
+#include <algorithm>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -12,12 +13,6 @@
 // File created to unpack the CAEN DT5202 into a class that stores all
 // of the data for each event. This version of the unpacker is designed
 // to work only with timing-only events (acqMode==0x02)
-
-bool eventTiming::CompareToT(eventTiming a, eventTiming b) {
-	return a.ToTmatched < b.ToTmatched;
-}
-
-////////
 
 eventTiming::eventTiming() {}
 
@@ -193,6 +188,10 @@ void Event::clear()
   timeStamp = 0;
   NHits = 0; // Number of recorded hits
   dataTiming.clear();
+}
+
+eventTiming Event::FindMax(function<bool(eventTiming, eventTiming)> comp) {
+	return *std::max_element(dataTiming.begin(), dataTiming.end(), comp);
 }
 
 

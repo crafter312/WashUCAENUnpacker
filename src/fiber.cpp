@@ -33,6 +33,8 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 	double threshhorz = 0;
 	double threshvert = 0;
 
+	// Horizontal fibers
+	double maxToT = horz->FindMax([](eventTiming a, eventTiming b) -> bool { a.ToTmatched < b.ToTmatched; }).ToTmatched;
 	int mult = horz->GetNHits();
   for (int i = 0; i < mult; i++) {
 		double PHraw = horz->GetTimingEvent(i).ToTmatched;

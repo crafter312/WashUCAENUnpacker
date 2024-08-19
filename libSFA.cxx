@@ -58,7 +58,7 @@ namespace ROOT {
       ::eventTiming *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::eventTiming));
       static ::ROOT::TGenericClassInfo 
-         instance("eventTiming", "src/CAENd5202.h", 11,
+         instance("eventTiming", "src/CAENd5202.h", 12,
                   typeid(::eventTiming), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &eventTiming_Dictionary, isa_proxy, 4,
                   sizeof(::eventTiming) );
@@ -106,7 +106,7 @@ namespace ROOT {
       ::Event *ptr = nullptr;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::Event));
       static ::ROOT::TGenericClassInfo 
-         instance("Event", "src/CAENd5202.h", 34,
+         instance("Event", "src/CAENd5202.h", 31,
                   typeid(::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &Event_Dictionary, isa_proxy, 4,
                   sizeof(::Event) );

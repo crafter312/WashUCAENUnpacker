@@ -2,6 +2,7 @@
 #define _eventCAEN
 
 #include <fstream>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -11,10 +12,6 @@ using namespace std;
 class eventTiming {
 
 public:
-
-	static bool CompareToT(eventTiming, eventTiming);
-
-	/****************************************/
 
 	eventTiming();
 
@@ -51,17 +48,18 @@ public:
   }
   
 	void clear();
+  void set_short(unsigned short &, char*&);
+  void set_24bit(unsigned int &, char*&);
 
 	long ReadHeader(ifstream*);
   long ReadEventFromStream(ifstream*, double*, double*); // input file, redgains, bluegains
 
-  void set_short(unsigned short &, char*&);
-  void set_24bit(unsigned int &, char*&);
+	eventTiming FindMax(function<bool(eventTiming, eventTiming)>);	
 
-	unsigned short GetNHits() { return NHits; }
-  eventTiming GetTimingEvent(unsigned int i) { return dataTiming[i]; };
-	unsigned char GetBoardID() { return boardID; }
-	double GetTimeStamp() { return timeStamp; }
+	const unsigned short GetNHits() { return NHits; }
+  const eventTiming GetTimingEvent(unsigned int i) { return dataTiming[i]; };
+	const unsigned char GetBoardID() { return boardID; }
+	const double GetTimeStamp() { return timeStamp; }
   
 private:
 	// Event info (Timing Mode)
