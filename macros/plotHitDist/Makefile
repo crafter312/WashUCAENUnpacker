@@ -5,8 +5,6 @@ BIN = $(MAIN)/bin
 # List sources manually
 SOURCE = CAENd5202.cpp fiber.cpp
 OBJECT = $(patsubst %, $(BIN)/%, $(notdir $(SOURCE:.cpp=.o)))
-HEADER = CAENd5202.h fiber.h
-LIBSRC = $(patsubst %, $(SRC)/%, $(HEADER))
 
 CC = g++
 LINKOPTION = $(shell root-config --libs --cflags)

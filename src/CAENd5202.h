@@ -57,14 +57,14 @@ public:
 	eventTiming FindMax(function<bool(eventTiming, eventTiming)>);	
 
 	const unsigned short GetNHits() { return NHits; }
-  const eventTiming GetTimingEvent(unsigned int i) { return dataTiming[i]; };
+  const eventTiming& GetTimingEvent(unsigned int i) { return dataTiming[i]; };
 	const unsigned char GetBoardID() { return boardID; }
 	const double GetTimeStamp() { return timeStamp; }
   
 private:
 	// Event info (Timing Mode)
   unsigned char boardID;
-  double timeStamp; // start of Tref window in ms
+  double timeStamp; // start of Tref window in us
 
 	// Event Data
 	unsigned short NHits;           // number of hits

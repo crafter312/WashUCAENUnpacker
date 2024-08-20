@@ -30,6 +30,7 @@ public:
 
 	int Nsingles = 0;
 	int Nmatched = 0;
+	int Nskipped = 0;
 
 	long nevts;
 

@@ -59,6 +59,7 @@ bool det::unpack(ifstream *pevtfile) {
 	unsigned int pos;
 
 	// Event loop (timing-only mode)
+	bool val;
 	for (;;) {
 		nbytes = SIPMevent->ReadEventFromStream(pevtfile, redgains, bluegains); // reads next event
 		if (nbytes == -1) break; // stop at end of file
@@ -129,7 +130,13 @@ void det::MatchEvents() {
 
 			if (tstampdiff < 2) {
 				// (Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
-				Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
+				bool val = Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
+				if (!val) {
+					redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
+					bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
+					Nskipped++;
+					return; // return early if not a valid matched event (doesn't pass time gates, for example)
+				}
 
 				//	Write histograms and tree here
 				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);

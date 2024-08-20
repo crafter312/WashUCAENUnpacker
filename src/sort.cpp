@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
   
   cout << "total (unmatched) singles: " << Det.Nsingles << " " << (float)Det.Nsingles/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%"<< endl; 
   cout << "total (matched) events: " << Det.Nmatched << " " << (float)Det.Nmatched/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%" << endl; 
+	cout << "matched events skipped: " << Det.Nskipped << endl;
 
   delete Histo; //need to delete the Histo because that is where the root files are written out
   
