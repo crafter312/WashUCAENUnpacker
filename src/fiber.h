@@ -20,8 +20,9 @@ public:
 	double sumhorz;
 	double sumvert;
 	double tstampdiff;
-	vector<int> tdiffx;
-	vector<int> tdiffy;
+	vector<double> tdiffx;
+	vector<double> tdiffy;
+	bool badty;
 	
 
 	double x, y, r;
@@ -30,8 +31,6 @@ public:
 	// Index of hit (type dataTiming) in vector with max ToT value
 	int posmaxhorz;
 	int posmaxvert;
-	int posmaxhorznew;
-	int posmaxvertnew;
 
 	bool make_2d(Event*, Event*, double);
 
