@@ -15,10 +15,10 @@ fiber::fiber() {}
 void fiber::clear() {
 	posmaxhorz = -1;
 	posmaxvert = -1;
-	sumhorz = -1;
-	sumvert = -1;
-	multTrimmedX = -1;
-	multTrimmedY = -1;
+	sumhorz = 0;
+	sumvert = 0;
+	multTrimmedX = 0;
+	multTrimmedY = 0;
 	tstampdiff = 0;
 	tdiffx.clear();
 	tdiffy.clear();
@@ -97,7 +97,7 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 		// Apply hit-wise time gate
 		tdiff = (double)(ev.ToA - maxHitBlue.ToA) * 0.5 + tstampdiff; //ns
 		tdiffy.push_back(tdiff);
-		if (tdiff < 250. || tdiff > 270.) continue;
+		if (tdiff < 230. || tdiff > 270.) continue;
 
 		// Get index of max ToT hit
 		if (ev.ToTmatched > maxToT) {
@@ -112,7 +112,7 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 		multTrimmedY++;
   }
 
-	// Mostly for testing, to analyze events that don't pass red layer hit time gate
+	// For testing, to analyze events that don't pass red fiber hit time gate
 	if (posmaxvert == -1) {
 		posmaxvert = posmaxvertalt;
 		badty = true;
