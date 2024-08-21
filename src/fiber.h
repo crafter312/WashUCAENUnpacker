@@ -22,6 +22,7 @@ public:
 	double tstampdiff;
 	vector<double> tdiffx;
 	vector<double> tdiffy;
+	bool badtx;
 	bool badty;
 	
 

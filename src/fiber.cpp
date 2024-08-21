@@ -22,6 +22,7 @@ void fiber::clear() {
 	tstampdiff = 0;
 	tdiffx.clear();
 	tdiffy.clear();
+	badtx = false;
 	badty = false;
 }
 
@@ -44,14 +45,27 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 	eventTiming ev;
 	int mult = horz->GetNHits();
 	double maxToT = 0;
+	double maxToTalt1 = 0;
+	int posmaxhorzalt = 0;
 	for (int i = 0; i < mult; i++) {
+
+		// Find alternate max ToT hit index
 		ev = horz->GetTimingEvent(i);
+		if (ev.ToTmatched > maxToTalt1) {
+			maxToTalt1 = ev.ToTmatched;
+			posmaxhorzalt = i;
+		}
+		
 		if ((ev.ToA < 650) || (ev.ToA > 740) || (ev.ToTmatched < maxToT)) continue;
 
 		maxToT = ev.ToTmatched;
 		posmaxhorz = i;
 	}
-	if (posmaxhorz == -1) return false;
+
+	if (posmaxhorz == -1) {
+		posmaxhorz = posmaxhorzalt;
+		badtx = true;
+	}
 
 	// Advance declaration of variables
   double momhorz = 0;
@@ -78,19 +92,19 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
     momhorz += PH * ((double)ev.pos);
 		multTrimmedX++;
   }
-	
+
 	// Vertical fibers (back layer)
 	tstampdiff = (vert->GetTimeStamp() - horz->GetTimeStamp()) * 1000.; //ns
 	mult = vert->GetNHits();
 	maxToT = 0;
-	double maxToTalt = 0;
+	double maxToTalt2 = 0;
 	int posmaxvertalt;
   for (int i = 0; i < mult; i++) {
 
 		// Find alternate max ToT hit index
 		ev = vert->GetTimingEvent(i);
-		if (ev.ToTmatched > maxToTalt) {
-			maxToTalt = ev.ToTmatched;
+		if (ev.ToTmatched > maxToTalt2) {
+			maxToTalt2 = ev.ToTmatched;
 			posmaxvertalt = i;
 		}
 
@@ -136,8 +150,8 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
   phideg = atan2(y , x) * rad_to_deg;         //deg
 
 	// Calculate additional values
-	xdev = x - (-1*(maxHitBlue.pos-0.5)*0.5 + 16);
-	ydev = y - (-1*(maxHitRed.pos-0.5)*0.5 + 16);
+	xdev = x - (-1*(ix-0.5)*0.5 + 16);
+	ydev = y - (-1*(iy-0.5)*0.5 + 16);
 
   return true;
 }

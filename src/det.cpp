@@ -131,11 +131,18 @@ void det::MatchEvents() {
 			if (tstampdiff < 2) {
 				// (Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
 				bool val = Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
+
+				//// PROGRAM CRASHES IF YOU REMOVE THE FOLLOWING IF STATEMENT ////
+				// it is currently completely useless, as the "fiber::make_2d"
+				// function above never at any point returns false. Note that the
+				// program worked just fine before I added this, and now that I've
+				// added it I can't remove it for some completely nonsensical reason.
 				if (!val) {
-					redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
-					bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
+					cout << "FALSE RETURN" << endl;
+					redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());    // the problem occurs if
+					bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end()); // you remove these lines
 					Nskipped++;
-					return; // return early if not a valid matched event (doesn't pass time gates, for example)
+					return; // (was meant to) return early if not a valid matched event (doesn't pass time gates, for example)
 				}
 
 				//	Write histograms and tree here
