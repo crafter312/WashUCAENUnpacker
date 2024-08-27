@@ -17,6 +17,8 @@ public:
 	int multTrimmedY;
 	double xdev;
 	double ydev;
+	double avgfibx;
+	double avgfiby;
 	double sumhorz;
 	double sumvert;
 	double tstampdiff;
@@ -32,6 +34,10 @@ public:
 	// Index of hit (type dataTiming) in vector with max ToT value
 	int posmaxhorz;
 	int posmaxvert;
+
+	// Indices for hits that pass all the various time gates
+	vector<int> xindices;
+	vector<int> yindices;
 
 	bool make_2d(Event*, Event*, double);
 

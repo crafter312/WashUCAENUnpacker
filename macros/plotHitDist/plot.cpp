@@ -37,7 +37,8 @@ int main(int argc, char* argv[]) {
 
 	// Set up TTreeReader
 	//string gate = "red.NHits>" + string(argv[3]);
-	string gate = "fiber.posmaxhorz!=fiber.posmaxhorznew";
+	//string gate = "fiber.posmaxhorz!=fiber.posmaxhorznew";
+	string gate = "!fiber.badtx && !fiber.badty && TMath::Abs(fiber.ix-fiber.avgfibx)<3 && TMath::Abs(blue.dataTiming.pos-fiber.ix)>5";
 	cout << "Event selection: " << gate << endl;
 	tmatch->Draw(">> elist", gate.c_str(), "entryList");
 	TEntryList* elist;
@@ -74,12 +75,10 @@ int main(int argc, char* argv[]) {
 		// Blue event
 		tempev = *blue;
 		cout << "Blue multiplicity: " << tempev.GetNHits() << endl;
+		cout << "Blue center fiber # - average fiber #: " << tempfib.ix - tempfib.avgfibx << endl;
 		cout << "posmaxhorz: " << tempfib.posmaxhorz << endl;
 		cout << "posmaxhorz ToT: " << tempev.GetTimingEvent(tempfib.posmaxhorz).ToTmatched << endl;
 		cout << "posmaxhorz ToA: " << tempev.GetTimingEvent(tempfib.posmaxhorz).ToA << endl;
-		cout << "posmaxhorznew: " << tempfib.posmaxhorznew << endl;
-		cout << "posmaxhorznew ToT: " << tempev.GetTimingEvent(tempfib.posmaxhorznew).ToTmatched << endl;
-		cout << "posmaxhorznew ToA: " << tempev.GetTimingEvent(tempfib.posmaxhorznew).ToA << endl;
 		for (int k = 0; k < tempev.GetNHits(); k++) {
 			ev = tempev.GetTimingEvent(k);
 			cout << "index: " << k << ", Fiber #: " << ev.pos << ", ToT: " << ev.ToTmatched << ", ToA: " << ev.ToA << endl;
@@ -96,8 +95,6 @@ int main(int argc, char* argv[]) {
 		cout << "Red multiplicity: " << tempev.GetNHits() << endl;
 		cout << "posmaxvert: " << tempfib.posmaxvert << endl;
 		cout << "posmaxvert ToT: " << tempev.GetTimingEvent(tempfib.posmaxvert).ToTmatched << endl;
-		cout << "posmaxvertnew: " << tempfib.posmaxvertnew << endl;
-		cout << "posmaxvertnew ToT: " << tempev.GetTimingEvent(tempfib.posmaxvertnew).ToTmatched << endl;
 		for (int k = 0; k < tempev.GetNHits(); k++) {
 			ev = tempev.GetTimingEvent(k);
 			cout << "index: " << k << ", Fiber #: " << ev.pos << ", ToT: " << ev.ToTmatched << ", ToA: " << ev.ToA << endl;

@@ -24,6 +24,8 @@ void fiber::clear() {
 	tdiffy.clear();
 	badtx = false;
 	badty = false;
+	xindices.clear();
+	yindices.clear();
 }
 
 /**
@@ -72,8 +74,11 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
   double momvert = 0;
 	double threshhorz = 0;
 	double threshvert = 0;
+	double sumfibhorz = 0;
+	double sumfibvert = 0;
 	double PH;
 	double tdiff;
+	int tempi;
 
 	// Horizontal fibers (front layer)
 	eventTiming maxHitBlue = horz->GetTimingEvent(posmaxhorz);
@@ -89,8 +94,11 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 		// Calculate values
 		PH = max(ev.ToTmatched - threshhorz, 0.);
 		sumhorz += PH;
-    momhorz += PH * ((double)ev.pos);
+    momhorz += PH * ev.pos;
+		sumfibhorz += ev.pos;
 		multTrimmedX++;
+		tempi = i;
+		xindices.push_back(tempi);
   }
 
 	// Vertical fibers (back layer)
@@ -122,8 +130,11 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 		// Calculate values
 		PH = max(ev.ToTmatched - threshvert, 0.);
 		sumvert += PH;
-    momvert += PH * ((double)ev.pos);
+    momvert += PH * ev.pos;
+		sumfibvert += ev.pos;
 		multTrimmedY++;
+		tempi = i;
+		yindices.push_back(tempi);
   }
 
 	// For testing, to analyze events that don't pass red fiber hit time gate
@@ -141,6 +152,8 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
   // Calculate center of gravity
   double fibhorz = momhorz / sumhorz;
   double fibvert = momvert / sumvert;
+	avgfibx = sumfibhorz / multTrimmedX;
+	avgfiby = sumfibvert / multTrimmedY;
 
   // Calculate physical parameters of matched event
   x = -1*(fibhorz-0.5)*0.5 + 16;              //mm

@@ -248,6 +248,71 @@ namespace ROOT {
 } // end of namespace ROOT for class ::fiber
 
 namespace ROOT {
+   static TClass *vectorlEintgR_Dictionary();
+   static void vectorlEintgR_TClassManip(TClass*);
+   static void *new_vectorlEintgR(void *p = nullptr);
+   static void *newArray_vectorlEintgR(Long_t size, void *p);
+   static void delete_vectorlEintgR(void *p);
+   static void deleteArray_vectorlEintgR(void *p);
+   static void destruct_vectorlEintgR(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<int>*)
+   {
+      vector<int> *ptr = nullptr;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<int>));
+      static ::ROOT::TGenericClassInfo 
+         instance("vector<int>", -2, "vector", 339,
+                  typeid(vector<int>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &vectorlEintgR_Dictionary, isa_proxy, 0,
+                  sizeof(vector<int>) );
+      instance.SetNew(&new_vectorlEintgR);
+      instance.SetNewArray(&newArray_vectorlEintgR);
+      instance.SetDelete(&delete_vectorlEintgR);
+      instance.SetDeleteArray(&deleteArray_vectorlEintgR);
+      instance.SetDestructor(&destruct_vectorlEintgR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<int> >()));
+
+      ::ROOT::AddClassAlternate("vector<int>","std::vector<int, std::allocator<int> >");
+      return &instance;
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<int>*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *vectorlEintgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<int>*)nullptr)->GetClass();
+      vectorlEintgR_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void vectorlEintgR_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_vectorlEintgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int> : new vector<int>;
+   }
+   static void *newArray_vectorlEintgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int>[nElements] : new vector<int>[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_vectorlEintgR(void *p) {
+      delete ((vector<int>*)p);
+   }
+   static void deleteArray_vectorlEintgR(void *p) {
+      delete [] ((vector<int>*)p);
+   }
+   static void destruct_vectorlEintgR(void *p) {
+      typedef vector<int> current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class vector<int>
+
+namespace ROOT {
    static TClass *vectorlEeventTiminggR_Dictionary();
    static void vectorlEeventTiminggR_TClassManip(TClass*);
    static void *new_vectorlEeventTiminggR(void *p = nullptr);
