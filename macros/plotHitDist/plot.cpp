@@ -21,6 +21,19 @@
 
 using namespace std;
 
+void SetAxisLabels(TH1* hist, const char* xlabel, const char* ylabel) {
+	TAxis* axis = hist->GetXaxis();
+	axis->SetTitle(xlabel);
+	axis->CenterTitle();
+	axis->SetTitleOffset(0.75);
+	axis->SetTitleSize(0.06);
+	axis = hist->GetYaxis();
+	axis->SetTitle(ylabel);
+	axis->CenterTitle();
+	axis->SetTitleOffset(0.75);
+	axis->SetTitleSize(0.06);
+}
+
 int main(int argc, char* argv[]) {
 
 	// Get run # from command line arguments
@@ -38,7 +51,10 @@ int main(int argc, char* argv[]) {
 	// Set up TTreeReader
 	//string gate = "red.NHits>" + string(argv[3]);
 	//string gate = "fiber.posmaxhorz!=fiber.posmaxhorznew";
-	string gate = "!fiber.badtx && !fiber.badty && TMath::Abs(fiber.ix-fiber.avgfibx)<3 && TMath::Abs(blue.dataTiming.pos-fiber.ix)>5";
+	//string gate = "!fiber.badtx && !fiber.badty && TMath::Abs(fiber.ix-fiber.avgfibx)<3 && TMath::Abs(blue.dataTiming.pos-fiber.ix)>5";
+	//string gate = "!fiber.badtx && !fiber.badty && TMath::Abs(fiber.ix-fiber.avgfibx)<3 && TMath::Abs(blue.dataTiming.pos-fiber.ix)>20";
+	//string gate = "!fiber.badtx && !fiber.badty && fiber.multTrimmedX>0 && fiber.multTrimmedY>0 && TMath::Abs(fiber.ix-fiber.avgfibx)>3";
+	string gate = "!fiber.badtx && !fiber.badty && fiber.multTrimmedX>0 && fiber.multTrimmedY>0 && TMath::Abs(fiber.ix-fiber.avgfibx)<3 && TMath::Abs(fiber.iy-fiber.avgfiby)>5";
 	cout << "Event selection: " << gate << endl;
 	tmatch->Draw(">> elist", gate.c_str(), "entryList");
 	TEntryList* elist;
@@ -53,13 +69,13 @@ int main(int argc, char* argv[]) {
 	TFile* ofile = new TFile("plot.root", "RECREATE");
 	ofile->cd();
 	TH1D* Fiber_totx = new TH1D("Fiber_totx", "", 64, -16, 16);
-	Fiber_totx->SetXTitle("X Fiber Position (mm)");
+	SetAxisLabels(Fiber_totx, "X Fiber Position (mm)", "ToT (arbitrary units)");
 	TH1D* Fiber_toty = new TH1D("Fiber_toty", "", 64, -16, 16);
-	Fiber_toty->SetXTitle("Y Fiber Position (mm)");
+	SetAxisLabels(Fiber_toty, "Y Fiber Position (mm)", "ToT (arbitrary units)");
 	TH1D* Fiber_postotx = new TH1D("Fiber_postotx", "", 64, 0, 64);
-	Fiber_postotx->SetXTitle("X Fiber #");
+	SetAxisLabels(Fiber_postotx, "X Fiber #", "ToT (arbitrary units)");
 	TH1D* Fiber_postoty = new TH1D("Fiber_postoty", "", 64, 0, 64);
-	Fiber_postoty->SetXTitle("Y Fiber #");
+	SetAxisLabels(Fiber_postoty, "Y Fiber #", "ToT (arbitrary units)");
 
 	// Event loop
 	int count = 0;
@@ -79,8 +95,10 @@ int main(int argc, char* argv[]) {
 		cout << "posmaxhorz: " << tempfib.posmaxhorz << endl;
 		cout << "posmaxhorz ToT: " << tempev.GetTimingEvent(tempfib.posmaxhorz).ToTmatched << endl;
 		cout << "posmaxhorz ToA: " << tempev.GetTimingEvent(tempfib.posmaxhorz).ToA << endl;
-		for (int k = 0; k < tempev.GetNHits(); k++) {
-			ev = tempev.GetTimingEvent(k);
+		for (int k = 0; k < tempfib.xindices.size(); k++) {
+			ev = tempev.GetTimingEvent(tempfib.xindices[k]);
+		//for (int k = 0; k < tempev.GetNHits(); k++) {
+			//ev = tempev.GetTimingEvent(k);
 			cout << "index: " << k << ", Fiber #: " << ev.pos << ", ToT: " << ev.ToTmatched << ", ToA: " << ev.ToA << endl;
 			temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
 			bin = Fiber_totx->GetXaxis()->FindBin(temppos);
@@ -95,8 +113,10 @@ int main(int argc, char* argv[]) {
 		cout << "Red multiplicity: " << tempev.GetNHits() << endl;
 		cout << "posmaxvert: " << tempfib.posmaxvert << endl;
 		cout << "posmaxvert ToT: " << tempev.GetTimingEvent(tempfib.posmaxvert).ToTmatched << endl;
-		for (int k = 0; k < tempev.GetNHits(); k++) {
-			ev = tempev.GetTimingEvent(k);
+		for (int k = 0; k < tempfib.yindices.size(); k++) {
+			ev = tempev.GetTimingEvent(tempfib.yindices[k]);
+		//for (int k = 0; k < tempev.GetNHits(); k++) {
+			//ev = tempev.GetTimingEvent(k);
 			cout << "index: " << k << ", Fiber #: " << ev.pos << ", ToT: " << ev.ToTmatched << ", ToA: " << ev.ToA << endl;
 			temppos = -1*(ev.pos-0.5)*0.5 + 16; //mm
 			bin = Fiber_toty->GetXaxis()->FindBin(temppos);

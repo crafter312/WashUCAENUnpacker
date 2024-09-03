@@ -1,5 +1,15 @@
 // Created by Nicholas Dronchi
-// Modified by Henry Webb 
+// Modified by Henry Webb
+//                 _.-.
+//          _.----'    `.
+//         /             `.
+//        /                `-._
+// VK   .'     __.----.        `-._
+//   .-'      /        `-._       =
+//  //       /             `-.    =
+//   //    .'                 `--.=
+//    // .'
+//     //
 
 #include "fiber.h"
 
@@ -163,8 +173,8 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
   phideg = atan2(y , x) * rad_to_deg;         //deg
 
 	// Calculate additional values
-	xdev = x - (-1*(ix-0.5)*0.5 + 16);
-	ydev = y - (-1*(iy-0.5)*0.5 + 16);
+	xdev = x - (-1*(ix-0.5)*0.5 + 16); //mm
+	ydev = y - (-1*(iy-0.5)*0.5 + 16); //mm
 
   return true;
 }
