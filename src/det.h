@@ -1,15 +1,13 @@
 #ifndef det_
 #define det_
 
+#include "CAENd5202.h"
+#include "fiber.h"
+#include "histo.h"
+
 #include <fstream>
 #include <string>
 #include <vector>
-
-class Event;
-class fiber;
-class histo;
-
-using namespace std;
 
 class det {
 
@@ -18,19 +16,22 @@ public:
 	~det();
 	histo* Histo;
 
-	bool unpack(ifstream*);
+	bool unpack(std::ifstream*);
 	void MatchEvents();
 	
-	Event* SIPMevent;
-	fiber* Fiber;
+	Event SIPMevent;
+	fiber Fiber;
 
 	// Vector of most recent 20 events
-	vector<Event*> redbuffevents;
-	vector<Event*> bluebuffevents;
+	std::vector<Event> redbuffevents;
+	std::vector<Event> bluebuffevents;
 
 	int Nsingles = 0;
 	int Nmatched = 0;
-	int Nskipped = 0;
+
+	int goodBlue    = 0;
+	int goodRed     = 0;
+	int goodMatched = 0;
 
 	long nevts;
 
@@ -41,7 +42,7 @@ private:
 
 	float distance;
 
-	void ReadGains(string, double*);
+	void ReadGains(std::string, double*);
 };
 
 #endif

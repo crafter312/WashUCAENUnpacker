@@ -54,14 +54,14 @@ void histo::clear() {
 	blue.clear();
 }
 
-void histo::FillTree(Event e) {
+void histo::FillTree(Event& e) {
   event = e;
   t->Fill();
 }
 
-void histo::FillMatchedTree(fiber* f, Event* r, Event* b) {
-	fib = *f;
-	red = *r;
-	blue = *b;
+void histo::FillMatchedTree(fiber& f, Event& r, Event& b) {
+	fib = f;
+	red = r;
+	blue = b;
 	tmatch->Fill();
 }

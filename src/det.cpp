@@ -5,19 +5,16 @@
 
 #include "det.h"
 
-#include "CAENd5202.h"
-#include "fiber.h"
-#include "histo.h"
-
 #include <iostream>
+#include <tuple>
 
 #define CONFIGPATH "/home/Li6Webb/Desktop/SFA/caenUnpacker/config/"
 
+using namespace std;
+
 // Constructor
-det::det(histo * Histo1, double d) {
+det::det(histo* Histo1, double d) : SIPMevent(), Fiber() {
 	Histo = Histo1;
-	SIPMevent = new Event();
-	Fiber = new fiber();
 	distance = d;
 
 	ReadGains(string(CONFIGPATH) + "blue_gain_matching.txt", bluegains);
@@ -50,7 +47,7 @@ bool det::unpack(ifstream *pevtfile) {
 
 	// Read file header
 	// THIS MUST BE DONE ONCE BEFORE READING AN EVENT!
-	nbytes = SIPMevent->ReadHeader(pevtfile);
+	nbytes = SIPMevent.ReadHeader(pevtfile);
 
 	// Declare common variables
 	eventTiming hit;
@@ -61,17 +58,17 @@ bool det::unpack(ifstream *pevtfile) {
 	// Event loop (timing-only mode)
 	bool val;
 	for (;;) {
-		nbytes = SIPMevent->ReadEventFromStream(pevtfile, redgains, bluegains); // reads next event
+		nbytes = SIPMevent.ReadEventFromStream(pevtfile, redgains, bluegains); // reads next event
 		if (nbytes == -1) break; // stop at end of file
 
-		Event* SIPMeventcur = new Event(SIPMevent);
+		Event SIPMeventcur(SIPMevent);
 		//cout << SIPMeventcur->Print(true) << endl;
 
 		// Loop through hits in event
-		unsigned char boardID = SIPMeventcur->GetBoardID();
-		int nhits = (int)SIPMeventcur->GetNHits();
+		unsigned char boardID = SIPMeventcur.GetBoardID();
+		int nhits = (int)SIPMeventcur.GetNHits();
 		for (int i = 0; i < nhits; i++) {
-			hit = SIPMeventcur->GetTimingEvent(i);
+			hit = SIPMeventcur.GetTimingEvent(i);
 			tot = hit.ToTmatched;
 			toa = hit.ToA;
 			pos = hit.pos;
@@ -86,27 +83,31 @@ bool det::unpack(ifstream *pevtfile) {
 		}
 		
 		// Fill output tree
-		Histo->FillTree(*SIPMeventcur);
+		Histo->FillTree(SIPMeventcur);
 
 		// Add event to buffer
 		if (boardID == 0) {
 			redbuffevents.insert(redbuffevents.begin(), SIPMeventcur);
 
 			// limit red vector size to 20
-			if (redbuffevents.size() > 20)
+			if (redbuffevents.size() > 20) {
+				goodRed += Fiber.isGoodSingleRed(redbuffevents[redbuffevents.size()-1]);
 				redbuffevents.pop_back(); //TODO potentially a huge bug, I don't know if I have actually deleted the variable and freed up memory
+			}
 		}
 		else if (boardID == 1) {
 			bluebuffevents.insert(bluebuffevents.begin(), SIPMeventcur);
 
 			// limit blue vector size to 20
-			if (bluebuffevents.size() > 20)
+			if (bluebuffevents.size() > 20) {
+				goodBlue += Fiber.isGoodSingleBlue(bluebuffevents[bluebuffevents.size()-1]);
 				bluebuffevents.pop_back();
+			}
 		}
 
 		MatchEvents();
 
-		SIPMevent->clear();
+		SIPMevent.clear();
 		Histo->clear();
 		nevts++;
 	}
@@ -126,37 +127,43 @@ void det::MatchEvents() {
 	for (int i = 0; i<redbuffevents.size(); i++) {
 		for (int j = 0; j<bluebuffevents.size(); j++) {
 
-			tstampdiff = abs(redbuffevents[i]->GetTimeStamp() - bluebuffevents[j]->GetTimeStamp());
+			tstampdiff = abs(redbuffevents[i].GetTimeStamp() - bluebuffevents[j].GetTimeStamp());
 
 			if (tstampdiff < 2) {
 				// (Event* horizontal, Event* vertical) <-this is how horz and vertical are assigned
-				bool val = Fiber->make_2d(bluebuffevents[j], redbuffevents[i], distance);
+				// return values are the same order in the tuple (i.e. { horz, vert }), although are
+				// not currently used
+				Fiber.make_2d(bluebuffevents[j], redbuffevents[i], distance);
 
-				//// PROGRAM CRASHES IF YOU REMOVE THE FOLLOWING IF STATEMENT ////
-				// it is currently completely useless, as the "fiber::make_2d"
-				// function above never at any point returns false. Note that the
-				// program worked just fine before I added this, and now that I've
-				// added it I can't remove it for some completely nonsensical reason.
-				if (!val) {
-					cout << "FALSE RETURN" << endl;
-					redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());    // the problem occurs if
-					bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end()); // you remove these lines
-					Nskipped++;
-					return; // (was meant to) return early if not a valid matched event (doesn't pass time gates, for example)
-				}
+				// Process matched events separately to be consistent for efficiency calculations
+				bool valRed = Fiber.isGoodSingleRed(redbuffevents[i]);
+				bool valBlue = Fiber.isGoodSingleBlue(bluebuffevents[j]);
+				goodMatched += valRed && valBlue;
+				goodRed += valRed && !valBlue;
+				goodBlue += valBlue && !valRed;
 
-				//	Write histograms and tree here
+				// Write histograms and tree here
 				Histo->FillMatchedTree(Fiber, redbuffevents[i], bluebuffevents[j]);
-				Histo->Fiber_ixiy->Fill(Fiber->ix, Fiber->iy);
-				Histo->Fiber_xy->Fill(Fiber->x, Fiber->y);
+				Histo->Fiber_ixiy->Fill(Fiber.ix, Fiber.iy);
+				Histo->Fiber_xy->Fill(Fiber.x, Fiber.y);
 
-				ev = bluebuffevents[j]->GetTimingEvent(Fiber->posmaxhorz);
+				ev = bluebuffevents[j].GetTimingEvent(Fiber.posmaxhorz);
 				Histo->Fiber_tot_summary_x->Fill(ev.pos, ev.ToTmatched);
 				Histo->Fiber_toax->Fill(ev.ToA);
 
-				ev = redbuffevents[i]->GetTimingEvent(Fiber->posmaxvert);
+				ev = redbuffevents[i].GetTimingEvent(Fiber.posmaxvert);
 				Histo->Fiber_tot_summary_y->Fill(ev.pos, ev.ToTmatched);
 				Histo->Fiber_toay->Fill(ev.ToA);
+
+				// Loop through single red events
+				int size = redbuffevents.size();
+				for (int m = i + 1; m < size; m++)
+					goodRed += Fiber.isGoodSingleRed(redbuffevents[m]);
+
+				// Loop through single blue events
+				size = bluebuffevents.size();
+				for (int m = j + 1; m < size; m++)
+					goodBlue += Fiber.isGoodSingleBlue(bluebuffevents[m]);
 
 				// Increment matched and unmatched counts
 				Nmatched += 1;

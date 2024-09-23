@@ -1,9 +1,8 @@
 #ifndef fiber_
 #define fiber_
 
+#include <tuple>
 #include <vector>
-
-using namespace std;
 
 class Event;
 
@@ -22,8 +21,8 @@ public:
 	double sumhorz;
 	double sumvert;
 	double tstampdiff;
-	vector<double> tdiffx;
-	vector<double> tdiffy;
+	std::vector<double> tdiffx;
+	std::vector<double> tdiffy;
 	bool badtx;
 	bool badty;
 	
@@ -36,14 +35,17 @@ public:
 	int posmaxvert;
 
 	// Indices for hits that pass all the various time gates
-	vector<int> xindices;
-	vector<int> yindices;
+	std::vector<int> xindices;
+	std::vector<int> yindices;
 
-	bool make_2d(Event*, Event*, double);
+	std::tuple<bool, bool> make_2d(Event&, Event&, double); // returns { horz, vert } to match constructor order
+	bool isGoodSingleRed(Event&);
+	bool isGoodSingleBlue(Event&);
 
 private:
 
 	void clear();
+	bool isGoodSingle(Event&, double, double);
 };
 
 #endif

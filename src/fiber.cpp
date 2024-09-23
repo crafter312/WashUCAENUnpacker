@@ -20,6 +20,8 @@
 #include <iostream>
 #include <cmath>
 
+using namespace std;
+
 fiber::fiber() {}
 
 void fiber::clear() {
@@ -49,20 +51,20 @@ void fiber::clear() {
  * Horzontal (blue) fiber gives x position
  * Vertical (red) fiber gives y position
  */
-bool fiber::make_2d(Event* horz, Event* vert, double distance) {
+tuple<bool, bool> fiber::make_2d(Event& horz, Event& vert, double distance) {
 	// Set default values
 	clear();
 
 	// Apply front layer ToA gate, find center hit
 	eventTiming ev;
-	int mult = horz->GetNHits();
+	int mult = horz.GetNHits();
 	double maxToT = 0;
 	double maxToTalt1 = 0;
 	int posmaxhorzalt = 0;
 	for (int i = 0; i < mult; i++) {
 
 		// Find alternate max ToT hit index
-		ev = horz->GetTimingEvent(i);
+		ev = horz.GetTimingEvent(i);
 		if (ev.ToTmatched > maxToTalt1) {
 			maxToTalt1 = ev.ToTmatched;
 			posmaxhorzalt = i;
@@ -91,15 +93,15 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 	int tempi;
 
 	// Horizontal fibers (front layer)
-	eventTiming maxHitBlue = horz->GetTimingEvent(posmaxhorz);
+	eventTiming maxHitBlue = horz.GetTimingEvent(posmaxhorz);
 	ix = maxHitBlue.pos;
   for (int i = 0; i < mult; i++) {
 
 		// Apply hit-wise time gate
-		ev = horz->GetTimingEvent(i);
+		ev = horz.GetTimingEvent(i);
 		tdiff = (double)(ev.ToA - maxHitBlue.ToA) * 0.5; //ns
 		tdiffx.push_back(tdiff);
-		if (tdiff < 0. || tdiff > 15.) continue;
+		if ((tdiff < 0.) || (tdiff > 15.)) continue;
 
 		// Calculate values
 		PH = max(ev.ToTmatched - threshhorz, 0.);
@@ -112,24 +114,26 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
   }
 
 	// Vertical fibers (back layer)
-	tstampdiff = (vert->GetTimeStamp() - horz->GetTimeStamp()) * 1000.; //ns
-	mult = vert->GetNHits();
+	tstampdiff = (vert.GetTimeStamp() - horz.GetTimeStamp()) * 1000.; //ns
+	mult = vert.GetNHits();
 	maxToT = 0;
 	double maxToTalt2 = 0;
 	int posmaxvertalt;
   for (int i = 0; i < mult; i++) {
 
 		// Find alternate max ToT hit index
-		ev = vert->GetTimingEvent(i);
+		ev = vert.GetTimingEvent(i);
 		if (ev.ToTmatched > maxToTalt2) {
 			maxToTalt2 = ev.ToTmatched;
 			posmaxvertalt = i;
 		}
 
 		// Apply hit-wise time gate
-		tdiff = (double)(ev.ToA - maxHitBlue.ToA) * 0.5 + tstampdiff; //ns
+		//tdiff = (double)(ev.ToA - maxHitBlue.ToA) * 0.5 + tstampdiff; //ns
+		tdiff = (double)(ev.ToA - maxHitBlue.ToA) * 0.5; //ns
 		tdiffy.push_back(tdiff);
-		if (tdiff < 230. || tdiff > 270.) continue;
+		//if (tdiff < 230. || tdiff > 270.) continue;
+		if((tdiff < -40.) || (tdiff > 32.)) continue;
 
 		// Get index of max ToT hit
 		if (ev.ToTmatched > maxToT) {
@@ -153,7 +157,7 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 		badty = true;
 	}
 
-	eventTiming maxHitRed = vert->GetTimingEvent(posmaxvert);
+	eventTiming maxHitRed = vert.GetTimingEvent(posmaxvert);
 	iy = maxHitRed.pos;
 
 	// CHANNEL TO FIBER
@@ -176,5 +180,33 @@ bool fiber::make_2d(Event* horz, Event* vert, double distance) {
 	xdev = x - (-1*(ix-0.5)*0.5 + 16); //mm
 	ydev = y - (-1*(iy-0.5)*0.5 + 16); //mm
 
-  return true;
+  return { !badtx && (maxHitBlue.ToTmatched > 76.) && (maxHitBlue.ToTmatched < 150.), !badty && (maxHitRed.ToTmatched > 55.) && (maxHitRed.ToTmatched < 85.) };
+}
+
+bool fiber::isGoodSingle(Event& single, double min, double max) {
+	// Apply ToA gate, find center hit
+	eventTiming ev;
+	int mult = single.GetNHits();
+	double maxToT = 0;
+	int posmaxalt = -1;
+	for (int i = 0; i < mult; i++) {
+		ev = single.GetTimingEvent(i);
+	
+		if ((ev.ToA < 650) || (ev.ToA > 730) || (ev.ToTmatched < maxToT)) continue;
+
+		maxToT = ev.ToTmatched;
+		posmaxalt = i;
+	}
+	if (posmaxalt == -1) return false;
+
+	eventTiming maxHit = single.GetTimingEvent(posmaxalt);
+	return (maxHit.ToTmatched > min) && (maxHit.ToTmatched < max);
+}
+
+bool fiber::isGoodSingleRed(Event& red) {
+	return isGoodSingle(red, 55, 85);
+}
+
+bool fiber::isGoodSingleBlue(Event& blue) {
+	return isGoodSingle(blue, 76, 150);
 }

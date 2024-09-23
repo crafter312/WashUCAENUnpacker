@@ -41,8 +41,8 @@ public:
   histo();
   ~histo();
 	void InitSpecMode();
-	void FillTree(Event);
-	void FillMatchedTree(fiber*, Event*, Event*);
+	void FillTree(Event&);
+	void FillMatchedTree(fiber&, Event&, Event&);
   void clear();
 
 	Event* GetRedEvent() { return &red; }

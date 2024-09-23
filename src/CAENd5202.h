@@ -32,7 +32,7 @@ class Event {
 
 public:
   Event();
-	Event(Event* rhs);
+	Event(const Event& rhs);
 
 	// For debugging
 	string Print(bool b) const;
@@ -56,10 +56,10 @@ public:
 
 	eventTiming FindMax(function<bool(eventTiming, eventTiming)>);	
 
-	const unsigned short GetNHits() { return NHits; }
-  const eventTiming& GetTimingEvent(unsigned int i) { return dataTiming[i]; };
-	const unsigned char GetBoardID() { return boardID; }
-	const double GetTimeStamp() { return timeStamp; }
+	unsigned short GetNHits() { return NHits; }
+  eventTiming& GetTimingEvent(unsigned int i) { return dataTiming[i]; };
+	unsigned char GetBoardID() { return boardID; }
+	double GetTimeStamp() { return timeStamp; }
   
 private:
 	// Event info (Timing Mode)

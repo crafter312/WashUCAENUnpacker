@@ -58,20 +58,19 @@ int main(int argc, char* argv[])
     }
     
     // unpacks all events and saves them in vectors for pulses and temperature events
+		// event matching and analysis is done here as well
     Det.unpack(&evtfile);
     // we are done with the data file at this point
     evtfile.close();
   }
   
-
-  
-
-  //here all the analysis is done on the vector of events
-  //Det.analyze();
-  
   cout << "total (unmatched) singles: " << Det.Nsingles << " " << (float)Det.Nsingles/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%"<< endl;
   cout << "total (matched) events: " << Det.Nmatched << " " << (float)Det.Nmatched/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%" << endl;
-	cout << "skipped events: " << Det.Nskipped << endl;
+	cout << "good single blue events: " << Det.goodBlue << endl;
+	cout << "good single red events: " << Det.goodRed << endl;
+	cout << "good matched events: " << Det.goodMatched << endl;
+	cout << "red (back) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodRed) * 100. << "\%" << endl;
+	cout << "blue (front) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodBlue) * 100. << "\%" << endl;
 
   delete Histo; //need to delete the Histo because that is where the root files are written out
   

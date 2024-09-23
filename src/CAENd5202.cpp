@@ -47,14 +47,14 @@ Event::Event() {
   clear();
 }
 
-Event::Event(Event* rhs) {
+Event::Event(const Event& rhs) {
 	// Copy event header info
-	boardID = rhs->boardID;
-	timeStamp = rhs->timeStamp;
-	NHits = rhs->NHits;	
+	boardID = rhs.boardID;
+	timeStamp = rhs.timeStamp;
+	NHits = rhs.NHits;	
 
 	// Copy event data
-	dataTiming = rhs->dataTiming;
+	dataTiming = rhs.dataTiming;
 }
 
 //set_vals in need Big Endian style
