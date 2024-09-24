@@ -66,8 +66,8 @@ int main(int argc, char* argv[])
   
   cout << "total (unmatched) singles: " << Det.Nsingles << " " << (float)Det.Nsingles/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%"<< endl;
   cout << "total (matched) events: " << Det.Nmatched << " " << (float)Det.Nmatched/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%" << endl;
-	cout << "good single blue events: " << Det.goodBlue << endl;
-	cout << "good single red events: " << Det.goodRed << endl;
+	cout << "good uncorrelated blue events: " << Det.goodBlue << endl;
+	cout << "good uncorrelated red events: " << Det.goodRed << endl;
 	cout << "good matched events: " << Det.goodMatched << endl;
 	cout << "red (back) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodRed) * 100. << "\%" << endl;
 	cout << "blue (front) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodBlue) * 100. << "\%" << endl;

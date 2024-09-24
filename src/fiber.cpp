@@ -180,7 +180,9 @@ tuple<bool, bool> fiber::make_2d(Event& horz, Event& vert, double distance) {
 	xdev = x - (-1*(ix-0.5)*0.5 + 16); //mm
 	ydev = y - (-1*(iy-0.5)*0.5 + 16); //mm
 
-  return { !badtx && (maxHitBlue.ToTmatched > 76.) && (maxHitBlue.ToTmatched < 150.), !badty && (maxHitRed.ToTmatched > 55.) && (maxHitRed.ToTmatched < 85.) };
+	//return { !badtx && (maxHitBlue.ToTmatched > 30.) && (maxHitBlue.ToTmatched < 120.), !badty && (maxHitRed.ToTmatched > 25.) && (maxHitRed.ToTmatched < 70.) };   // carbon
+  return { !badtx && (maxHitBlue.ToTmatched > 76.) && (maxHitBlue.ToTmatched < 150.), !badty && (maxHitRed.ToTmatched > 55.) && (maxHitRed.ToTmatched < 85.) };   // alphas
+	//return { !badtx && (maxHitBlue.ToTmatched > 140.) && (maxHitBlue.ToTmatched < 200.), !badty && (maxHitRed.ToTmatched > 75.) && (maxHitRed.ToTmatched < 140.) }; // carbon
 }
 
 bool fiber::isGoodSingle(Event& single, double min, double max) {
@@ -192,7 +194,9 @@ bool fiber::isGoodSingle(Event& single, double min, double max) {
 	for (int i = 0; i < mult; i++) {
 		ev = single.GetTimingEvent(i);
 	
-		if ((ev.ToA < 650) || (ev.ToA > 730) || (ev.ToTmatched < maxToT)) continue;
+		//if ((ev.ToA < 660) || (ev.ToA > 735) || (ev.ToTmatched < maxToT)) continue; // deuterons
+		if ((ev.ToA < 650) || (ev.ToA > 730) || (ev.ToTmatched < maxToT)) continue; // alphas
+		//if ((ev.ToA < 650) || (ev.ToA > 740) || (ev.ToTmatched < maxToT)) continue; // carbon
 
 		maxToT = ev.ToTmatched;
 		posmaxalt = i;
@@ -204,9 +208,13 @@ bool fiber::isGoodSingle(Event& single, double min, double max) {
 }
 
 bool fiber::isGoodSingleRed(Event& red) {
-	return isGoodSingle(red, 55, 85);
+	//return isGoodSingle(red, 25, 70);  // deuteron
+	return isGoodSingle(red, 55, 85);  // alphas
+	//return isGoodSingle(red, 75, 140); // carbon
 }
 
 bool fiber::isGoodSingleBlue(Event& blue) {
-	return isGoodSingle(blue, 76, 150);
+	//return isGoodSingle(blue, 30, 120);  // deuterons
+	return isGoodSingle(blue, 76, 150);  // alphas
+	//return isGoodSingle(blue, 140, 200); // carbon
 }
