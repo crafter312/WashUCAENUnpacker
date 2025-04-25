@@ -185,7 +185,7 @@ tuple<bool, bool> fiber::make_2d(Event& horz, Event& vert, double distance) {
 	//return { !badtx && (maxHitBlue.ToTmatched > 140.) && (maxHitBlue.ToTmatched < 200.), !badty && (maxHitRed.ToTmatched > 75.) && (maxHitRed.ToTmatched < 140.) }; // carbon
 }
 
-bool fiber::isGoodSingle(Event& single, double min, double max) {
+bool fiber::isGoodSingle(Event& single, int mintoa, int maxtoa/*, double mintot, double maxtot*/) {
 	// Apply ToA gate, find center hit
 	eventTiming ev;
 	int mult = single.GetNHits();
@@ -195,26 +195,31 @@ bool fiber::isGoodSingle(Event& single, double min, double max) {
 		ev = single.GetTimingEvent(i);
 	
 		//if ((ev.ToA < 660) || (ev.ToA > 735) || (ev.ToTmatched < maxToT)) continue; // deuterons
-		if ((ev.ToA < 650) || (ev.ToA > 730) || (ev.ToTmatched < maxToT)) continue; // alphas
+		if ((ev.ToA < mintoa) || (ev.ToA > maxtoa) || (ev.ToTmatched < maxToT)) continue; // alphas
 		//if ((ev.ToA < 650) || (ev.ToA > 740) || (ev.ToTmatched < maxToT)) continue; // carbon
 
 		maxToT = ev.ToTmatched;
 		posmaxalt = i;
 	}
-	if (posmaxalt == -1) return false;
+	return posmaxalt != -1;
 
-	eventTiming maxHit = single.GetTimingEvent(posmaxalt);
-	return (maxHit.ToTmatched > min) && (maxHit.ToTmatched < max);
+	//if (posmaxalt == -1) return false;
+	//eventTiming maxHit = single.GetTimingEvent(posmaxalt);
+	//return (maxHit.ToTmatched > mintot) && (maxHit.ToTmatched < maxtot);
 }
 
 bool fiber::isGoodSingleRed(Event& red) {
+	return isGoodSingle(red, 679, 703);
+
 	//return isGoodSingle(red, 25, 70);  // deuteron
-	return isGoodSingle(red, 55, 85);  // alphas
+	//return isGoodSingle(red, 55, 85);  // alphas
 	//return isGoodSingle(red, 75, 140); // carbon
 }
 
 bool fiber::isGoodSingleBlue(Event& blue) {
+	return isGoodSingle(blue, 685, 705);
+
 	//return isGoodSingle(blue, 30, 120);  // deuterons
-	return isGoodSingle(blue, 76, 150);  // alphas
+	//return isGoodSingle(blue, 76, 150);  // alphas
 	//return isGoodSingle(blue, 140, 200); // carbon
 }

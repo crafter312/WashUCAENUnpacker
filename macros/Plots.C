@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <stdexcept>
 
 // Create default variables
@@ -147,3 +148,53 @@ void HitDist(int runnum, int boardID = 1, int ymax = 1) {
 	st->SetY2NDC(0.9);
 	st->Draw();
 }
+
+// For use with gain matching
+// Plots the center hit ToT for a specific fiber and fits
+// it with a Gaussian
+void ToTPeakFit(int runnum, int fibernum, int boardID = 1, double dxl = 5, double dxr = 3) {
+	OpenFile(runnum);
+	TTree* tmatch = ifile->Get<TTree>("tmatch");
+
+	string title = boardID == 1
+		? "Blue Fiber Center Hit ToT (fiber "
+		: "Red Fiber Center Hit ToT (fiber ";
+	title += to_string(fibernum) + string(")");
+	TH1I* tot = new TH1I("tot", title.c_str(), 512, 0, 512);
+
+	string varexp = boardID == 1
+		? "blue.dataTiming[fiber.posmaxhorz].ToT"
+		: "red.dataTiming[fiber.posmaxvert].ToT";
+	varexp += ">>tot";
+	string selection = boardID == 1
+		? "fiber.ix=="
+		: "fiber.iy==";
+	selection += to_string(fibernum);
+	tmatch->Draw(varexp.c_str(), selection.c_str(), "goff");
+	tot->Draw("");
+
+	double centroid = tot->GetMaximumBin();
+	cout << "Bin with maximum value: " << centroid << endl;
+
+	TF1* gaus = new TF1("gaus", "gaus", centroid-dxl, centroid+dxr);
+	gaus->SetRange(centroid-dxl, centroid+dxr);
+	gaus->SetParameter(0, tot->GetMaximum());
+	gaus->SetParameter(1, centroid);
+	gaus->SetParameter(2, 10);
+	gaus->SetParLimits(0, 0, 100000);
+	gaus->SetParLimits(1, centroid-dxl, centroid+dxr);
+	gaus->SetParLimits(2, 0, 30);
+	gaus->SetParName(0, "Constant");
+	gaus->SetParName(1, "Mean");
+	gaus->SetParName(2, "Sigma");
+
+	gaus->SetLineColor(kRed);
+	tot->Fit(gaus, "NR", "", centroid-dxl, centroid+dxr);
+	gaus->DrawCopy("CSAME");
+
+	cout << "Centroid: " << setprecision(10) << gaus->GetParameter(1) << endl;
+}
+
+
+
+

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <assert.h>
 #define G__DICTIONARY
-#include "RConfig.h"
+#include "ROOT/RConfig.hxx"
 #include "TClass.h"
 #include "TDictAttributeMap.h"
 #include "TInterpreter.h"
@@ -71,14 +71,14 @@ namespace ROOT {
    }
    TGenericClassInfo *GenerateInitInstance(const ::eventTiming*)
    {
-      return GenerateInitInstanceLocal((::eventTiming*)nullptr);
+      return GenerateInitInstanceLocal(static_cast<::eventTiming*>(nullptr));
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::eventTiming*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const ::eventTiming*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *eventTiming_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::eventTiming*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const ::eventTiming*>(nullptr))->GetClass();
       eventTiming_TClassManip(theClass);
    return theClass;
    }
@@ -119,14 +119,14 @@ namespace ROOT {
    }
    TGenericClassInfo *GenerateInitInstance(const ::Event*)
    {
-      return GenerateInitInstanceLocal((::Event*)nullptr);
+      return GenerateInitInstanceLocal(static_cast<::Event*>(nullptr));
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::Event*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const ::Event*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *Event_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::Event*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const ::Event*>(nullptr))->GetClass();
       Event_TClassManip(theClass);
    return theClass;
    }
@@ -167,14 +167,14 @@ namespace ROOT {
    }
    TGenericClassInfo *GenerateInitInstance(const ::fiber*)
    {
-      return GenerateInitInstanceLocal((::fiber*)nullptr);
+      return GenerateInitInstanceLocal(static_cast<::fiber*>(nullptr));
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const ::fiber*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const ::fiber*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *fiber_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::fiber*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const ::fiber*>(nullptr))->GetClass();
       fiber_TClassManip(theClass);
    return theClass;
    }
@@ -194,14 +194,14 @@ namespace ROOT {
    }
    // Wrapper around operator delete
    static void delete_eventTiming(void *p) {
-      delete ((::eventTiming*)p);
+      delete (static_cast<::eventTiming*>(p));
    }
    static void deleteArray_eventTiming(void *p) {
-      delete [] ((::eventTiming*)p);
+      delete [] (static_cast<::eventTiming*>(p));
    }
    static void destruct_eventTiming(void *p) {
       typedef ::eventTiming current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class ::eventTiming
 
@@ -215,14 +215,14 @@ namespace ROOT {
    }
    // Wrapper around operator delete
    static void delete_Event(void *p) {
-      delete ((::Event*)p);
+      delete (static_cast<::Event*>(p));
    }
    static void deleteArray_Event(void *p) {
-      delete [] ((::Event*)p);
+      delete [] (static_cast<::Event*>(p));
    }
    static void destruct_Event(void *p) {
       typedef ::Event current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class ::Event
 
@@ -236,14 +236,14 @@ namespace ROOT {
    }
    // Wrapper around operator delete
    static void delete_fiber(void *p) {
-      delete ((::fiber*)p);
+      delete (static_cast<::fiber*>(p));
    }
    static void deleteArray_fiber(void *p) {
-      delete [] ((::fiber*)p);
+      delete [] (static_cast<::fiber*>(p));
    }
    static void destruct_fiber(void *p) {
       typedef ::fiber current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class ::fiber
 
@@ -273,15 +273,15 @@ namespace ROOT {
       instance.SetDestructor(&destruct_vectorlEintgR);
       instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<int> >()));
 
-      ::ROOT::AddClassAlternate("vector<int>","std::vector<int, std::allocator<int> >");
+      instance.AdoptAlternate(::ROOT::AddClassAlternate("vector<int>","std::vector<int, std::allocator<int> >"));
       return &instance;
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<int>*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const vector<int>*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *vectorlEintgR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<int>*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const vector<int>*>(nullptr))->GetClass();
       vectorlEintgR_TClassManip(theClass);
    return theClass;
    }
@@ -294,21 +294,21 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlEintgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int> : new vector<int>;
+      return  p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<int> : new vector<int>;
    }
    static void *newArray_vectorlEintgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<int>[nElements] : new vector<int>[nElements];
+      return p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<int>[nElements] : new vector<int>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlEintgR(void *p) {
-      delete ((vector<int>*)p);
+      delete (static_cast<vector<int>*>(p));
    }
    static void deleteArray_vectorlEintgR(void *p) {
-      delete [] ((vector<int>*)p);
+      delete [] (static_cast<vector<int>*>(p));
    }
    static void destruct_vectorlEintgR(void *p) {
       typedef vector<int> current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class vector<int>
 
@@ -338,15 +338,15 @@ namespace ROOT {
       instance.SetDestructor(&destruct_vectorlEeventTiminggR);
       instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<eventTiming> >()));
 
-      ::ROOT::AddClassAlternate("vector<eventTiming>","std::vector<eventTiming, std::allocator<eventTiming> >");
+      instance.AdoptAlternate(::ROOT::AddClassAlternate("vector<eventTiming>","std::vector<eventTiming, std::allocator<eventTiming> >"));
       return &instance;
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<eventTiming>*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const vector<eventTiming>*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *vectorlEeventTiminggR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<eventTiming>*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const vector<eventTiming>*>(nullptr))->GetClass();
       vectorlEeventTiminggR_TClassManip(theClass);
    return theClass;
    }
@@ -359,21 +359,21 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlEeventTiminggR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<eventTiming> : new vector<eventTiming>;
+      return  p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<eventTiming> : new vector<eventTiming>;
    }
    static void *newArray_vectorlEeventTiminggR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<eventTiming>[nElements] : new vector<eventTiming>[nElements];
+      return p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<eventTiming>[nElements] : new vector<eventTiming>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlEeventTiminggR(void *p) {
-      delete ((vector<eventTiming>*)p);
+      delete (static_cast<vector<eventTiming>*>(p));
    }
    static void deleteArray_vectorlEeventTiminggR(void *p) {
-      delete [] ((vector<eventTiming>*)p);
+      delete [] (static_cast<vector<eventTiming>*>(p));
    }
    static void destruct_vectorlEeventTiminggR(void *p) {
       typedef vector<eventTiming> current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class vector<eventTiming>
 
@@ -403,15 +403,15 @@ namespace ROOT {
       instance.SetDestructor(&destruct_vectorlEdoublegR);
       instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<double> >()));
 
-      ::ROOT::AddClassAlternate("vector<double>","std::vector<double, std::allocator<double> >");
+      instance.AdoptAlternate(::ROOT::AddClassAlternate("vector<double>","std::vector<double, std::allocator<double> >"));
       return &instance;
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal((const vector<double>*)nullptr); R__UseDummy(_R__UNIQUE_DICT_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_DICT_(Init) = GenerateInitInstanceLocal(static_cast<const vector<double>*>(nullptr)); R__UseDummy(_R__UNIQUE_DICT_(Init));
 
    // Dictionary for non-ClassDef classes
    static TClass *vectorlEdoublegR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<double>*)nullptr)->GetClass();
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal(static_cast<const vector<double>*>(nullptr))->GetClass();
       vectorlEdoublegR_TClassManip(theClass);
    return theClass;
    }
@@ -424,21 +424,21 @@ namespace ROOT {
 namespace ROOT {
    // Wrappers around operator new
    static void *new_vectorlEdoublegR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<double> : new vector<double>;
+      return  p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<double> : new vector<double>;
    }
    static void *newArray_vectorlEdoublegR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<double>[nElements] : new vector<double>[nElements];
+      return p ? ::new(static_cast<::ROOT::Internal::TOperatorNewHelper*>(p)) vector<double>[nElements] : new vector<double>[nElements];
    }
    // Wrapper around operator delete
    static void delete_vectorlEdoublegR(void *p) {
-      delete ((vector<double>*)p);
+      delete (static_cast<vector<double>*>(p));
    }
    static void deleteArray_vectorlEdoublegR(void *p) {
-      delete [] ((vector<double>*)p);
+      delete [] (static_cast<vector<double>*>(p));
    }
    static void destruct_vectorlEdoublegR(void *p) {
       typedef vector<double> current_t;
-      ((current_t*)p)->~current_t();
+      (static_cast<current_t*>(p))->~current_t();
    }
 } // end of namespace ROOT for class vector<double>
 
@@ -460,8 +460,8 @@ nullptr
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_AutoLoading_Map;
-class __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventTiming;
-class __attribute__((annotate(R"ATTRDUMP(file_name@@@/home/Li6Webb/Desktop/SFA/caenUnpacker/src/CAENd5202.h)ATTRDUMP"))) __attribute__((annotate(R"ATTRDUMP(pattern@@@*)ATTRDUMP"))) __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  Event;
+class __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  eventTiming;
+class __attribute__((annotate("$clingAutoload$src/CAENd5202.h")))  Event;
 class __attribute__((annotate("$clingAutoload$src/fiber.h")))  fiber;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(

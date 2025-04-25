@@ -64,13 +64,14 @@ int main(int argc, char* argv[])
     evtfile.close();
   }
   
-  cout << "total (unmatched) singles: " << Det.Nsingles << " " << (float)Det.Nsingles/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%"<< endl;
-  cout << "total (matched) events: " << Det.Nmatched << " " << (float)Det.Nmatched/(float)(Det.Nsingles+Det.Nmatched) * 100 << "\%" << endl;
+  cout << "total uncorrelated blue events: " << Det.nUncorrBlue << " " << (float)Det.nMatched/(float)(Det.nUncorrBlue + Det.nMatched) * 100 << "\%"<< endl;
+  cout << "total uncorrelated red events: " << Det.nUncorrRed << " " << (float)Det.nMatched/(float)(Det.nUncorrRed + Det.nMatched) * 100 << "\%"<< endl;
+  cout << "total matched events: " << Det.nMatched << " " << (float)Det.nMatched/(float)(Det.nUncorrBlue + Det.nUncorrRed + Det.nMatched) * 100 << "\%" << endl;
 	cout << "good uncorrelated blue events: " << Det.goodBlue << endl;
 	cout << "good uncorrelated red events: " << Det.goodRed << endl;
 	cout << "good matched events: " << Det.goodMatched << endl;
-	cout << "red (back) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodRed) * 100. << "\%" << endl;
 	cout << "blue (front) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodBlue) * 100. << "\%" << endl;
+	cout << "red (back) efficiency: " << (double)Det.goodMatched / (double)(Det.goodMatched + Det.goodRed) * 100. << "\%" << endl;
 
   delete Histo; //need to delete the Histo because that is where the root files are written out
   

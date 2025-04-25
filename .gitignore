@@ -2,3 +2,6 @@
 *.root
 /RootFiles
 *.zip
+*.o
+sort
+macros/plotHitDist/plot

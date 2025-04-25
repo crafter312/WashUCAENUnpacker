@@ -45,7 +45,7 @@ public:
 private:
 
 	void clear();
-	bool isGoodSingle(Event&, double, double);
+	bool isGoodSingle(Event&, int, int/*, double, double*/);
 };
 
 #endif

@@ -166,14 +166,15 @@ void det::MatchEvents() {
 					goodBlue += Fiber.isGoodSingleBlue(bluebuffevents[m]);
 
 				// Increment matched and unmatched counts
-				Nmatched += 1;
-				Nsingles += redbuffevents.size() - i + bluebuffevents.size() - j - 2;
+				nUncorrBlue += bluebuffevents.size() - j - 1;
+				nUncorrRed += redbuffevents.size() - i - 1;
+				nMatched += 1;
 
 				// Delete all events older than matched pair
 				redbuffevents.erase(redbuffevents.begin()+i, redbuffevents.end());
 				bluebuffevents.erase(bluebuffevents.begin()+j, bluebuffevents.end());
 				
-				if (Nmatched > 1) return;
+				if (nMatched > 1) return;
 
 				// Plot hit map for individual events
 				tempev = Histo->GetBlueEvent();

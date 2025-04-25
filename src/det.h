@@ -26,8 +26,9 @@ public:
 	std::vector<Event> redbuffevents;
 	std::vector<Event> bluebuffevents;
 
-	int Nsingles = 0;
-	int Nmatched = 0;
+	int nUncorrBlue = 0;
+	int nUncorrRed  = 0;
+	int nMatched    = 0;
 
 	int goodBlue    = 0;
 	int goodRed     = 0;

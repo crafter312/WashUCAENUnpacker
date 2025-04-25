@@ -10,7 +10,7 @@ LIBSRC = $(patsubst %, $(SRC)/%, $(HEADER))
 CC = g++
 LINKOPTION = $(shell root-config --libs --cflags)
 INCLUDE = -I$(shell root-config --incdir)
-CFLAGS = -c -w -std=c++14 $(INCLUDE)
+CFLAGS = -c -w -std=c++17 $(INCLUDE)
 
 sort : $(BIN)/sort.o $(OBJECT) libSFA.cxx
 	@echo "Linking..."
