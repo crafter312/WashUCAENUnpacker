@@ -195,6 +195,21 @@ void ToTPeakFit(int runnum, int fibernum, int boardID = 1, double dxl = 5, doubl
 	cout << "Centroid: " << setprecision(10) << gaus->GetParameter(1) << endl;
 }
 
+// Chain multiple files and make summary plot
+void ChainedSummary(vector<int> nums, int boardID = 1) {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = "/home/Li6Webb/Desktop/SFA/caenUnpacker/RootFiles/Run" + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
+
+	string varexp = boardID == 1
+		? "blue.dataTiming.ToTmatched:blue.dataTiming.pos"
+		: "red.dataTiming.ToTmatched:red.dataTiming.pos";
+	varexp += ">>h(64,0,64,512,0,512)";
+	chain.Draw(varexp.c_str(), "", "colz");
+}
 
 
 
