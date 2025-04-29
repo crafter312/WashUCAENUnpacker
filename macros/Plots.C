@@ -1,37 +1,29 @@
+#include <algorithm>
 #include <iomanip>
 #include <stdexcept>
 
 // Create default variables
 {
-	TFile* ifile = new TFile();
-	int num = -1;
+	string DATAPATH = "/home/Li6Webb/Desktop/SFA/caenUnpacker/RootFiles/Run";
 
 	gPad->SetTickx();
 	gPad->SetTicky();
 }
 
-void OpenFile(int runnum) {
-	if (ifile->IsOpen() && (runnum == num)) return;
-	
-	num = runnum;
-	string name = "/home/Li6Webb/Desktop/SFA/caenUnpacker/RootFiles/Run" + to_string(runnum) + ".root";
-	ifile = new TFile(name.c_str(), "READ");
-}
-
-void SetAliases(TTree* t) {
+void SetAliases(TChain& ch) {
 	// Common aliases
-	t->SetAlias("t_layer_diff", "TMath::Abs(blue.dataTiming[fiber.posmaxhorz].ToA-red.dataTiming[fiber.posmaxvert].ToA)<20");
+	ch.SetAlias("t_layer_diff", "TMath::Abs(blue.dataTiming[fiber.posmaxhorz].ToA-red.dataTiming[fiber.posmaxvert].ToA)<20");
 
 	// Blue fiber aliases
-	t->SetAlias("t_center_hit_blue", "(blue.dataTiming[fiber.posmaxhorz].ToA)>650 && (blue.dataTiming[fiber.posmaxhorz].ToA)<740");
-	t->SetAlias("t_hit_diff_blue", "(blue.dataTiming.ToA-blue.dataTiming[fiber.posmaxhorz].ToA)>=0 && (blue.dataTiming.ToA-blue.dataTiming[fiber.posmaxhorz].ToA)<50");
+	ch.SetAlias("t_center_hit_blue", "(blue.dataTiming[fiber.posmaxhorz].ToA)>650 && (blue.dataTiming[fiber.posmaxhorz].ToA)<740");
+	ch.SetAlias("t_hit_diff_blue", "(blue.dataTiming.ToA-blue.dataTiming[fiber.posmaxhorz].ToA)>=0 && (blue.dataTiming.ToA-blue.dataTiming[fiber.posmaxhorz].ToA)<50");
 
 	// Red fiber aliases
-	t->SetAlias("t_center_hit_red", "(red.dataTiming[fiber.posmaxvert].ToA)>650 && (red.dataTiming[fiber.posmaxvert].ToA)<740");
-	t->SetAlias("t_hit_diff_red", "(red.dataTiming.ToA-red.dataTiming[fiber.posmaxvert].ToA)>=0 && (red.dataTiming.ToA-red.dataTiming[fiber.posmaxvert].ToA)<100");
+	ch.SetAlias("t_center_hit_red", "(red.dataTiming[fiber.posmaxvert].ToA)>650 && (red.dataTiming[fiber.posmaxvert].ToA)<740");
+	ch.SetAlias("t_hit_diff_red", "(red.dataTiming.ToA-red.dataTiming[fiber.posmaxvert].ToA)>=0 && (red.dataTiming.ToA-red.dataTiming[fiber.posmaxvert].ToA)<100");
 }
 
-void FillScaledHitToT(TTree* t, string histname, int i, int boardID, bool abs = false) {
+void FillScaledHitToT(TChain& ch, string histname, int i, int boardID, bool abs = false) {
 	abs = (i == 0) ? false : abs;
 	string varexp = boardID == 1
 		? "blue.dataTiming.ToTmatched/fiber.sumhorz>>" + histname
@@ -39,18 +31,22 @@ void FillScaledHitToT(TTree* t, string histname, int i, int boardID, bool abs = 
 	string selection = boardID == 1
 		? ("(blue.dataTiming.pos-fiber.ix)==" + to_string(i) + (abs ? " || (blue.dataTiming.pos-fiber.ix)==" + to_string(i*-1) : ""))
 		: ("(red.dataTiming.pos-fiber.iy)==" + to_string(i) + (abs ? " || (red.dataTiming.pos-fiber.iy)==" + to_string(i*-1) : ""));
-	t->Draw(varexp.c_str(),selection.c_str(),"goff");
+	ch.Draw(varexp.c_str(),selection.c_str(),"goff");
 }
 
-void ScaledHitToT(int runnum, int boardID = 1, int i = 0, bool abs = false, string newtitle = "") {
-	OpenFile(runnum);
-	TTree* tmatch = ifile->Get<TTree>("tmatch");
+void ScaledHitToT(vector<int> nums, int boardID = 1, int i = 0, bool abs = false, string newtitle = "") {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = DATAPATH + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
 
 	string defaulttitle = "% ToT " + to_string(i) + " Hit" + (i == 1 ? "" : "s") + " from Center";
 	string title = ((newtitle == "") ? defaulttitle : newtitle) + ";Fraction of Total ToT;Counts per Bin";
 
 	TH1I* h = new TH1I("h", "h", 128, 0, 1);
-	FillScaledHitToT(tmatch, h->GetName(), i, boardID, abs);
+	FillScaledHitToT(chain, h->GetName(), i, boardID, abs);
 	h->SetTitle(title.c_str());
 	h->SetStats(0);
 
@@ -67,14 +63,18 @@ void ScaledHitToT(int runnum, int boardID = 1, int i = 0, bool abs = false, stri
 	h->Draw();
 }
 
-void LightLeakage(int runnum, int boardID = 1) {
-	OpenFile(runnum);
-	TTree* tmatch = ifile->Get<TTree>("tmatch");
+void LightLeakage(vector<int> nums, int boardID = 1) {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = DATAPATH + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
 
 	TH1D* percentHist = new TH1D("percentHist", "Percent Light in Fiber", 4, 0, 4);
 	for (int i = 0; i < 4; i++) {
 		TH1I* h0 = new TH1I("h0", "h0", 128, 0, 1);
-		FillScaledHitToT(tmatch, h0->GetName(), i, boardID, i != 0);
+		FillScaledHitToT(chain, h0->GetName(), i, boardID, i != 0);
 		percentHist->Fill(i, h0->GetMean());
 		delete h0;
 	}
@@ -82,10 +82,14 @@ void LightLeakage(int runnum, int boardID = 1) {
 	percentHist->Draw();
 }
 
-void HitMultFit(int runnum, int boardID = 1, int max = 12) {
-	OpenFile(runnum);
-	TTree* tmatch = ifile->Get<TTree>("tmatch");
-	SetAliases(tmatch);
+void HitMultFit(vector<int> nums, int boardID = 1, int max = 12) {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = DATAPATH + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
+	SetAliases(chain);
 
 	string title = boardID == 1
 		? "Blue Fiber Hit Multiplicity"
@@ -100,7 +104,7 @@ void HitMultFit(int runnum, int boardID = 1, int max = 12) {
 		? "t_center_hit_blue"
 		: "t_center_hit_red";
 	selection += " && t_layer_diff";
-	tmatch->Draw(varexp.c_str(), selection.c_str(), "goff");
+	chain.Draw(varexp.c_str(), selection.c_str(), "goff");
 
 	// Fit with Poisson distribution
 	TF1* fit = new TF1("fit", "gaus", 0, max);
@@ -118,10 +122,14 @@ void HitMultFit(int runnum, int boardID = 1, int max = 12) {
 	st->Draw();
 }
 
-void HitDist(int runnum, int boardID = 1, int ymax = 1) {
-	OpenFile(runnum);
-	TTree* tmatch = ifile->Get<TTree>("tmatch");
-	SetAliases(tmatch);
+void HitDist(vector<int> nums, int boardID = 1, int ymax = 1) {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = DATAPATH + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
+	SetAliases(chain);
 
 	string title = boardID == 1
 		? "Blue Fiber Hit Map"
@@ -136,7 +144,7 @@ void HitDist(int runnum, int boardID = 1, int ymax = 1) {
 		? "t_center_hit_blue && t_hit_diff_blue"
 		: "t_center_hit_red && t_hit_diff_red && red.NHits<=4";
 	selection += " && t_layer_diff";
-	tmatch->Draw(varexp.c_str(), selection.c_str(), "goff");
+	chain.Draw(varexp.c_str(), selection.c_str(), "goff");
 	hitMap->Draw("colz");
 	gPad->Update();
 
@@ -149,18 +157,45 @@ void HitDist(int runnum, int boardID = 1, int ymax = 1) {
 	st->Draw();
 }
 
-// For use with gain matching
-// Plots the center hit ToT for a specific fiber and fits
-// it with a Gaussian
-void ToTPeakFit(int runnum, int fibernum, int boardID = 1, double dxl = 5, double dxr = 3) {
-	OpenFile(runnum);
-	TTree* tmatch = ifile->Get<TTree>("tmatch");
+// For use with gain matching, plots the center hit ToT for a specific fiber and fits
+// it with a Gaussian distribution
+//	- nums: a list of run numbers to merge into a TChain object
+//	- fibernum: the number of fiber to plot and fit
+//	- boardID: the relevant board number; defaults to board 1 (blue/front)
+//	- mult: the maximum hit multiplicity of events being considered
+//	- dxl: the left range of the fit
+//	- dxr: the right range of the fit
+void ToTPeakFit(vector<int> nums, int fibernum, int boardID = 1, int mult = 1, double dxl = 5, double dxr = 3) {
+	TChain chain("tmatch");
+	string name;
+	for (int i = 0; i < nums.size(); i++) {
+		name = DATAPATH + to_string(nums[i]) + ".root";
+		chain.Add(name.c_str());
+	}
 
 	string title = boardID == 1
 		? "Blue Fiber Center Hit ToT (fiber "
 		: "Red Fiber Center Hit ToT (fiber ";
 	title += to_string(fibernum) + string(")");
-	TH1I* tot = new TH1I("tot", title.c_str(), 512, 0, 512);
+
+	cout << "searching for histogram..." << endl;
+	TH1I* hist = nullptr;
+	TList* primitives = gPad->GetListOfPrimitives(); 
+	for (TObject* obj: *primitives) {
+		if (TH1* v = dynamic_cast<TH1*>(obj)) {
+			string objName = string(obj->GetName());
+			if (objName == "tot") {
+				hist = dynamic_cast<TH1I*>(v);
+				cout << "histogram found!" << endl;
+			}
+		}
+	}
+	if (hist == nullptr) {
+		hist = new TH1I("tot", title.c_str(), 512, 0, 512);
+		cout << "histogram not found, making new one!" << endl;
+	}
+	else
+		hist->SetTitle(title.c_str());
 
 	string varexp = boardID == 1
 		? "blue.dataTiming[fiber.posmaxhorz].ToT"
@@ -169,16 +204,19 @@ void ToTPeakFit(int runnum, int fibernum, int boardID = 1, double dxl = 5, doubl
 	string selection = boardID == 1
 		? "fiber.ix=="
 		: "fiber.iy==";
-	selection += to_string(fibernum);
-	tmatch->Draw(varexp.c_str(), selection.c_str(), "goff");
-	tot->Draw("");
+	string multGate = boardID == 1
+		? "blue.NHits<="
+		: "red.NHits<=";
+	selection += to_string(fibernum) + " && " + multGate + to_string(mult);
+	chain.Draw(varexp.c_str(), selection.c_str(), "goff");
+	hist->Draw("");
 
-	double centroid = tot->GetMaximumBin();
+	double centroid = hist->GetMaximumBin();
 	cout << "Bin with maximum value: " << centroid << endl;
 
 	TF1* gaus = new TF1("gaus", "gaus", centroid-dxl, centroid+dxr);
 	gaus->SetRange(centroid-dxl, centroid+dxr);
-	gaus->SetParameter(0, tot->GetMaximum());
+	gaus->SetParameter(0, hist->GetMaximum());
 	gaus->SetParameter(1, centroid);
 	gaus->SetParameter(2, 10);
 	gaus->SetParLimits(0, 0, 100000);
@@ -189,10 +227,11 @@ void ToTPeakFit(int runnum, int fibernum, int boardID = 1, double dxl = 5, doubl
 	gaus->SetParName(2, "Sigma");
 
 	gaus->SetLineColor(kRed);
-	tot->Fit(gaus, "NR", "", centroid-dxl, centroid+dxr);
+	hist->Fit(gaus, "NR", "", centroid-dxl, centroid+dxr);
 	gaus->DrawCopy("CSAME");
 
 	cout << "Centroid: " << setprecision(10) << gaus->GetParameter(1) << endl;
+	cout << "Sigma: " << setprecision(10) << gaus->GetParameter(2) << endl;
 }
 
 // Chain multiple files and make summary plot
@@ -200,7 +239,7 @@ void ChainedSummary(vector<int> nums, int boardID = 1) {
 	TChain chain("tmatch");
 	string name;
 	for (int i = 0; i < nums.size(); i++) {
-		name = "/home/Li6Webb/Desktop/SFA/caenUnpacker/RootFiles/Run" + to_string(nums[i]) + ".root";
+		name = DATAPATH + to_string(nums[i]) + ".root";
 		chain.Add(name.c_str());
 	}
 
